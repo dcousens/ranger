@@ -3,7 +3,11 @@
 #include <algorithm>
 #include "ranger.hpp"
 
+#ifdef __APPLE__
+#include <machine/endian.h>
+#else
 #include "endian.h"
+#endif
 
 #if __BYTE_ORDER != __LITTLE_ENDIAN
 #error "big endian architecture not supported"
