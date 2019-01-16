@@ -259,9 +259,9 @@ void overloadTests () {
 	assert(xr.size() == 4);
 	assert(xr.back() == 4);
 	assert(xr.begin() == xr.data());
-// 	range(x).data(); // FAILS :)
 
-	memmove(xr.data(), xr.data(), xr.size());
+// 	range(x).data(); // FAILS :)
+	memmove(xr.data(), xr.data(), xr.size()); // OK
 
 	auto rxr = retro(xr);
 	while (!rxr.empty()) {
