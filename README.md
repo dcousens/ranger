@@ -1,6 +1,8 @@
 # ranger
 A modern, header-only, range library for C++.
 
+**WARNING:** This library is a work in progress,  please report any bugs!
+
 
 ## Example
 
