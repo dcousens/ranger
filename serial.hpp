@@ -25,7 +25,7 @@ namespace serial {
 		assert(count <= r.size());
 
 		E value;
-		auto copy = range(r);
+		auto copy = ranger::range(r);
 		auto ptr = reinterpret_cast<T*>(&value);
 
 		if (BE) {
@@ -47,7 +47,7 @@ namespace serial {
 		constexpr auto count = sizeof(E) / sizeof(T);
 		assert(count <= r.size());
 
-		auto copy = range(r);
+		auto copy = ranger::range(r);
 		auto ptr = reinterpret_cast<const T*>(&e);
 
 		if (BE) {

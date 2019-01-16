@@ -10,6 +10,8 @@
 #include "../ranger.hpp"
 #include "../serial.hpp"
 
+using namespace ranger;
+
 template <bool text = false, typename R>
 void printr (const R r) {
 	for (auto s = r; !s.empty(); s.popFront()) {
