@@ -34,7 +34,7 @@ namespace __ranger {
 		>::type
 	>
 	void put (R& r, E e) {
-		while (!e.empty()) {
+		while (not e.empty()) {
 			r.front() = e.front();
 			r.popFront();
 			e.popFront();

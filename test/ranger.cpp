@@ -14,7 +14,7 @@ using namespace ranger;
 
 template <bool text = false, typename R>
 void printr (const R r) {
-	for (auto s = r; !s.empty(); s.popFront()) {
+	for (auto s = r; not s.empty(); s.popFront()) {
 		printf(text ? "%c" : "%i ", s.front());
 	}
 	printf("\n");
@@ -216,7 +216,7 @@ void otherUsageTests () {
 	vs['z'] = 555;
 
 	auto rm = range(vs);
-	for (auto i = rm; !i.empty(); i.popFront()) {
+	for (auto i = rm; not i.empty(); i.popFront()) {
 		printf("%c-%i ", i.front().first, i.front().second);
 	}
 
@@ -264,7 +264,7 @@ void overloadTests () {
 	memmove(xr.data(), xr.data(), xr.size()); // OK
 
 	auto rxr = retro(xr);
-	while (!rxr.empty()) {
+	while (not rxr.empty()) {
 		assert(rxr.back() == xr.front());
 
 		xr.popFront();
@@ -285,8 +285,8 @@ void orderedTests () {
 	assert(s.contains(1));
 	assert(s.contains(3));
 	assert(s.contains(4));
-	assert(!s.contains(0));
-	assert(!s.contains(5));
+	assert(not s.contains(0));
+	assert(not s.contains(5));
 	assert(s.lowerBound(5) == s.end());
 
 	// !!! invalidates `s`!
