@@ -100,12 +100,12 @@ namespace __ranger {
 
 		// mutators
 		void pop_back () { this->pop_back(1); }
-		void pop_back (size_t n) {
+		void pop_back (const size_t n) {
 			assert(n <= this->size());
 			std::advance(this->_end, -n);
 		}
 		void pop_front () { this->pop_front(1); }
-		void pop_front (size_t n) {
+		void pop_front (const size_t n) {
 			assert(n <= this->size());
 			std::advance(this->_begin, n);
 		}
