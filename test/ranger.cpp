@@ -14,7 +14,7 @@ using namespace ranger;
 
 template <bool text = false, typename R>
 void printr (const R r) {
-	for (auto s = r; not s.empty(); s.popFront()) {
+	for (auto s = r; not s.empty(); s.pop_front()) {
 		printf(text ? "%c" : "%i ", s.front());
 	}
 	printf("\n");
@@ -47,10 +47,10 @@ void rangeTests () {
 	assert(d.back() == 17);
 	d.back() = 11;
 	assert(d.back() == 11);
-	d.popBack();
+	d.pop_back();
 	assert(d.back() == 54);
 
-	d.popFrontN(20);
+	d.pop_front(20);
 	assert(d[0] == a[20]);
 }
 
@@ -64,7 +64,7 @@ void rangeTests2 () {
 	auto g = range(e);
 	assert(e.size() == g.size());
 
-	g.popFrontN(30);
+	g.pop_front(30);
 	assert(g.size() == e.size() - 30);
 
 	auto h = range(g);
@@ -97,7 +97,7 @@ void rangeTests3 () {
 	auto b = a.take(2); //
 	assert(a.size() == 2);
 	assert(b.size() == 2);
-	a.popFrontN(2);
+	a.pop_front(2);
 	assert(a.size() == 0);
 	assert(b.size() == 2);
 	assert(b[0] == numbers[0]);
@@ -216,7 +216,7 @@ void otherUsageTests () {
 	vs['z'] = 555;
 
 	auto rm = range(vs);
-	for (auto i = rm; not i.empty(); i.popFront()) {
+	for (auto i = rm; not i.empty(); i.pop_front()) {
 		printf("%c-%i ", i.front().first, i.front().second);
 	}
 
@@ -267,8 +267,8 @@ void overloadTests () {
 	while (not rxr.empty()) {
 		assert(rxr.back() == xr.front());
 
-		xr.popFront();
-		rxr.popBack();
+		xr.pop_front();
+		rxr.pop_back();
 	}
 
 	assert(xr.size() == 0);

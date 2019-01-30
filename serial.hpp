@@ -29,9 +29,9 @@ namespace serial {
 		auto ptr = reinterpret_cast<T*>(&value);
 
 		if (BE) {
-			for (size_t i = 0; i < count; ++i, copy.popFront()) ptr[count - 1 - i] = copy.front();
+			for (size_t i = 0; i < count; ++i, copy.pop_front()) ptr[count - 1 - i] = copy.front();
 		} else {
-			for (size_t i = 0; i < count; ++i, copy.popFront()) ptr[i] = copy.front();
+			for (size_t i = 0; i < count; ++i, copy.pop_front()) ptr[i] = copy.front();
 		}
 
 		return value;
@@ -51,9 +51,9 @@ namespace serial {
 		auto ptr = reinterpret_cast<const T*>(&e);
 
 		if (BE) {
-			for (size_t i = 0; i < count; ++i, copy.popFront()) copy.front() = ptr[count - 1 - i];
+			for (size_t i = 0; i < count; ++i, copy.pop_front()) copy.front() = ptr[count - 1 - i];
 		} else {
-			for (size_t i = 0; i < count; ++i, copy.popFront()) copy.front() = ptr[i];
+			for (size_t i = 0; i < count; ++i, copy.pop_front()) copy.front() = ptr[i];
 		}
 	}
 
@@ -62,7 +62,7 @@ namespace serial {
 		using T = typename R::value_type;
 
 		const auto e = peek<E, BE, R>(r);
-		r.popFrontN(sizeof(E) / sizeof(T));
+		r.pop_front(sizeof(E) / sizeof(T));
 		return e;
 	}
 
@@ -71,7 +71,7 @@ namespace serial {
 		using T = typename R::value_type;
 
 		place<E, BE, R>(r, e);
-		r.popFrontN(sizeof(E) / sizeof(T));
+		r.pop_front(sizeof(E) / sizeof(T));
 	}
 
 	// rvalue references wrappers

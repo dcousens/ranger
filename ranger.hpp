@@ -8,21 +8,21 @@
 namespace __ranger {
 	template <typename R>
 	auto drop (R r, const size_t n) {
-		r.popFrontN(n);
+		r.pop_front(n);
 		return std::move(r);
 	}
 
 	// TODO: specialization for ranges without .size()
 	template <typename R>
 	auto take (R r, const size_t n) {
-		r.popBackN(r.size() - n);
+		r.pop_back(r.size() - n);
 		return std::move(r);
 	}
 
 	template <typename R>
 	void put (R& r, typename R::value_type e) {
 		r.front() = e;
-		r.popFront();
+		r.pop_front();
 	}
 
 	template <
@@ -36,8 +36,8 @@ namespace __ranger {
 	void put (R& r, E e) {
 		while (not e.empty()) {
 			r.front() = e.front();
-			r.popFront();
-			e.popFront();
+			r.pop_front();
+			e.pop_front();
 		}
 	}
 
@@ -99,13 +99,13 @@ namespace __ranger {
 		}
 
 		// mutators
-		void popBack () { this->popBackN(1); }
-		void popBackN (size_t n) {
+		void pop_back () { this->pop_back(1); }
+		void pop_back (size_t n) {
 			assert(n <= this->size());
 			std::advance(this->_end, -n);
 		}
-		void popFront () { this->popFrontN(1); }
-		void popFrontN (size_t n) {
+		void pop_front () { this->pop_front(1); }
+		void pop_front (size_t n) {
 			assert(n <= this->size());
 			std::advance(this->_begin, n);
 		}
@@ -128,12 +128,12 @@ namespace __ranger {
 		}
 
 		template <typename V>
-		auto lowerBound (const V& value) const {
+		auto lower_bound (const V& value) const {
 			return std::lower_bound(this->begin(), this->end(), value, this->f);
 		}
 
 		template <typename V>
-		auto upperBound (const V& value) const {
+		auto upper_bound (const V& value) const {
 			return std::upper_bound(this->begin(), this->end(), value, this->f);
 		}
 	};
