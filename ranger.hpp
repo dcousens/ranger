@@ -65,10 +65,16 @@ namespace __ranger {
 			return static_cast<size_t>(diff);
 		}
 		auto take (size_t n) const { return __ranger::take(*this, n); }
-		auto& back () { return *(this->_end - 1); }
-		auto& back () const { return *(this->_end - 1); }
-		auto& front () { return *this->_begin; }
-		auto& front () const { return *this->_begin; }
+		auto& back () {
+			assert(this->_begin != this->_end);
+			return *(this->_end - 1);
+		}
+		auto& back () const { return this->back(); }
+		auto& front () {
+			assert(this->_begin != this->_end);
+			return *this->_begin;
+		}
+		auto& front () const { return this->front(); }
 
 		template <typename U=I>
 		typename std::enable_if<std::is_pointer<U>::value, I>::type data () {
@@ -101,11 +107,11 @@ namespace __ranger {
 
 		// mutators
 		void pop_back () {
-			assert(std::distance(this->_begin, this->_end) > 0);
+			assert(this->_begin != this->_end);
 			std::advance(this->_end, -1);
 		}
 		void pop_front () {
-			assert(std::distance(this->_begin, this->_end) > 0);
+			assert(this->_begin != this->_end);
 			std::advance(this->_begin, 1);
 		}
 
@@ -144,6 +150,11 @@ namespace ranger {
 		using iterator = decltype(r.begin());
 
 		return __ranger::Range<iterator>(r.begin(), r.end());
+	}
+
+	template <typename I>
+	auto iter_range (I& begin, I& end) {
+		return __ranger::Range<I>(begin, end);
 	}
 
 	template <typename R>

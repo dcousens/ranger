@@ -322,10 +322,31 @@ void putTests () {
 	assert(x[3] == 5);
 }
 
+#include <iostream>
+#include <iterator>
+#include <sstream>
+
+void iterTests () {
+	std::stringstream ss{"5 7 9"};
+	std::istream_iterator<int> start{ss};
+	std::istream_iterator<int> end;
+
+	auto a = iter_range(start, end);
+
+// 	printf("%zu\n", a.size()); // destructive!
+	assert(a.front() == 5);
+	a.pop_front();
+	assert(a.front() == 7);
+	a.pop_front();
+	assert(a.front() == 9);
+// 	a.pop_front(); // throws
+}
+
 int main () {
 	rangeTests();
 	rangeTests2();
 	rangeTests3();
+	iterTests();
 	retroTests();
 	putTests();
 	orderedTests();

@@ -1,5 +1,6 @@
 # ranger
-A modern, header-only, range library for C++.
+A header-only library for wrapping wrapping C++ STL iterators in a range-like interface.
+
 
 **WARNING:** This library is a work in progress,  please report any bugs!
 
