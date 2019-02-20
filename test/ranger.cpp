@@ -339,7 +339,14 @@ void iterTests () {
 	assert(a.front() == 7);
 	a.pop_front();
 	assert(a.front() == 9);
+	a.pop_front();
+	assert(a.empty());
 // 	a.pop_front(); // throws
+
+	auto b = iter_range(start, end);
+	assert(b.front() == 5); // cached by 'start' iterator...
+	b.pop_front();
+	assert(b.empty()); // stringstream is depleted
 }
 
 int main () {
