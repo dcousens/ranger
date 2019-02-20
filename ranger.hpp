@@ -101,11 +101,11 @@ namespace __ranger {
 
 		// mutators
 		void pop_back () {
-			assert(1 <= this->size());
+			assert(std::distance(this->_begin, this->_end) > 0);
 			std::advance(this->_end, -1);
 		}
 		void pop_front () {
-			assert(1 <= this->size());
+			assert(std::distance(this->_begin, this->_end) > 0);
 			std::advance(this->_begin, 1);
 		}
 
