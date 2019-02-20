@@ -8,15 +8,16 @@
 namespace __ranger {
 	template <typename R>
 	auto drop (R r, const size_t n) {
-		r.pop_front(n);
-		return std::move(r);
+		auto begin = r.begin();
+		std::advance(begin, n);
+		return R(begin, r.end());
 	}
 
 	template <typename R>
 	auto take (R r, const size_t n) {
-		auto u = r;
-		u.pop_front(n);
-		return R(r.begin(), u.begin());
+		auto end = r.begin();
+		std::advance(end, n);
+		return R(r.begin(), end);
 	}
 
 	template <typename R>
@@ -99,15 +100,13 @@ namespace __ranger {
 		}
 
 		// mutators
-		void pop_back () { this->pop_back(1); }
-		void pop_back (const size_t n) {
-			assert(n <= this->size());
-			std::advance(this->_end, -n);
+		void pop_back () {
+			assert(1 <= this->size());
+			std::advance(this->_end, -1);
 		}
-		void pop_front () { this->pop_front(1); }
-		void pop_front (const size_t n) {
-			assert(n <= this->size());
-			std::advance(this->_begin, n);
+		void pop_front () {
+			assert(1 <= this->size());
+			std::advance(this->_begin, 1);
 		}
 
 		template <typename E>

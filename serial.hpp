@@ -62,7 +62,7 @@ namespace serial {
 		using T = typename R::value_type;
 
 		const auto e = peek<E, BE, R>(r);
-		r.pop_front(sizeof(E) / sizeof(T));
+		r = r.drop(sizeof(E) / sizeof(T));
 		return e;
 	}
 
@@ -71,7 +71,7 @@ namespace serial {
 		using T = typename R::value_type;
 
 		place<E, BE, R>(r, e);
-		r.pop_front(sizeof(E) / sizeof(T));
+		r = r.drop(sizeof(E) / sizeof(T));
 	}
 
 	// rvalue references wrappers

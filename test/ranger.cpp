@@ -50,7 +50,7 @@ void rangeTests () {
 	d.pop_back();
 	assert(d.back() == 54);
 
-	d.pop_front(20);
+	d = d.drop(20);
 	assert(d[0] == a[20]);
 }
 
@@ -64,7 +64,7 @@ void rangeTests2 () {
 	auto g = range(e);
 	assert(e.size() == g.size());
 
-	g.pop_front(30);
+	g = g.drop(30);
 	assert(g.size() == e.size() - 30);
 
 	auto h = range(g);
@@ -97,7 +97,7 @@ void rangeTests3 () {
 	auto b = a.take(2); //
 	assert(a.size() == 2);
 	assert(b.size() == 2);
-	a.pop_front(2);
+	a = a.drop(2);
 	assert(a.size() == 0);
 	assert(b.size() == 2);
 	assert(b[0] == numbers[0]);
