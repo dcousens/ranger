@@ -2,7 +2,7 @@ CXX=clang++
 CFLAGS=-std=c++1z -pedantic -W -Wall -Wcast-qual -Wconversion -Werror -Wextra -Wwrite-strings
 IFLAGS=
 LFLAGS=
-OFLAGS=
+OFLAGS=-ggdb3
 
 SOURCES=test/ranger.cpp
 OBJECTS=$(addsuffix .o, $(basename $(SOURCES)))
