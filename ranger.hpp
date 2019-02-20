@@ -12,11 +12,11 @@ namespace __ranger {
 		return std::move(r);
 	}
 
-	// TODO: specialization for ranges without .size()
 	template <typename R>
 	auto take (R r, const size_t n) {
-		r.pop_back(r.size() - n);
-		return std::move(r);
+		auto u = r;
+		u.pop_front(n);
+		return R(r.begin(), u.begin());
 	}
 
 	template <typename R>
