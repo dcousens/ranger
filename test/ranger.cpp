@@ -287,11 +287,11 @@ void orderedTests () {
 	assert(s.contains(4));
 	assert(not s.contains(0));
 	assert(not s.contains(5));
-	assert(s.lowerBound(5) == s.end());
+	assert(s.lower_bound(5) == s.end());
 
 	// !!! invalidates `s`!
 	assert(x.begin() == s.begin());
-	x.emplace(s.lowerBound(5), 240);
+	x.emplace(s.lower_bound(5), 240);
 	assert(x.begin() != s.begin());
 
 	// safe again
