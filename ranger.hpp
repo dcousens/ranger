@@ -66,12 +66,12 @@ namespace __ranger {
 		}
 		auto take (size_t n) const { return __ranger::take(*this, n); }
 		auto& back () {
-			assert(this->_begin != this->_end);
+			assert(!this->empty());
 			return *(this->_end - 1);
 		}
 		auto& back () const { return this->back(); }
 		auto& front () {
-			assert(this->_begin != this->_end);
+			assert(!this->empty());
 			return *this->_begin;
 		}
 		auto& front () const { return this->front(); }
@@ -107,11 +107,11 @@ namespace __ranger {
 
 		// mutators
 		void pop_back () {
-			assert(this->_begin != this->_end);
+			assert(!this->empty());
 			std::advance(this->_end, -1);
 		}
 		void pop_front () {
-			assert(this->_begin != this->_end);
+			assert(!this->empty());
 			std::advance(this->_begin, 1);
 		}
 
