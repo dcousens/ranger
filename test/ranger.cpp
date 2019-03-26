@@ -35,6 +35,8 @@ void rangeTests () {
 	assert(a.size() == 32);
 	assert(b.size() == 22);
 	assert(c.size() == 1);
+	assert(c.front() == 63);
+	assert(c.back() == 63);
 	assert(c[0] == 63);
 
 	auto d = range(a);
