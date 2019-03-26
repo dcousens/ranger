@@ -131,25 +131,21 @@ namespace __ranger {
 
 	template <typename I, typename F>
 	struct OrderedRange : public Range<I> {
-	private:
-		F f;
-
 	public:
-		OrderedRange (I begin, I end, const F& f) : Range<I>(begin, end), f(f) {}
+		OrderedRange (I begin, I end) : Range<I>(begin, end) {}
 
-		template <typename V>
-		auto contains (const V& value) const {
-			return std::binary_search(this->begin(), this->end(), value, this->f);
+		using value_type = typename Range<I>::value_type;
+
+		auto contains (const value_type& value) const {
+			return std::binary_search(this->begin(), this->end(), value, F());
 		}
 
-		template <typename V>
-		auto lower_bound (const V& value) const {
-			return std::lower_bound(this->begin(), this->end(), value, this->f);
+		auto lower_bound (const value_type& value) const {
+			return std::lower_bound(this->begin(), this->end(), value, F());
 		}
 
-		template <typename V>
-		auto upper_bound (const V& value) const {
-			return std::upper_bound(this->begin(), this->end(), value, this->f);
+		auto upper_bound (const value_type& value) const {
+			return std::upper_bound(this->begin(), this->end(), value, F());
 		}
 	};
 }
@@ -190,17 +186,16 @@ namespace ranger {
 		return __ranger::Range<reverse_iterator>(reverse_iterator(r.end()), reverse_iterator(r.begin()));
 	}
 
-	template <typename R, typename F>
-	auto ordered (R& r, const F& f) {
+	template <typename F, typename R>
+	auto ordered (R& r) {
 		using iterator = decltype(r.begin());
 
-		return __ranger::OrderedRange<iterator, F>(r.begin(), r.end(), f);
+		return __ranger::OrderedRange<iterator, F>(r.begin(), r.end());
 	}
 
 	template <typename R>
 	auto ordered (R& r) {
-		auto compare = std::less<>();
-		return ordered(r, compare);
+		return ordered<std::less<>, R>(r);
 	}
 
 	// rvalue references wrappers
@@ -208,5 +203,5 @@ namespace ranger {
 	template <typename R> auto ptr_range (R&& r) { return ptr_range<R>(r); }
 	template <typename R> auto retro (R&& r) { return retro<R>(r); }
 	template <typename R> auto ordered (R&& r) { return ordered<R>(r); }
-	template <typename R, typename F> auto ordered (R&& r, const F& f) { return ordered<R, F>(r, f); }
+	template <typename F, typename R> auto ordered (R&& r) { return ordered<R, F>(r); }
 }

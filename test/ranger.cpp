@@ -280,6 +280,13 @@ void overloadTests () {
 // 	xr.put(10);
 }
 
+struct less {
+	template <typename T>
+	bool operator() (T a, T b) {
+		return a < b;
+	}
+};
+
 void orderedTests () {
 	std::vector<uint8_t> x = {1, 2, 3, 4};
 
@@ -291,23 +298,23 @@ void orderedTests () {
 	assert(not s.contains(5));
 	assert(s.lower_bound(5) == s.end());
 
-	// !!! invalidates `s`!
 	assert(x.begin() == s.begin());
-	x.emplace(s.lower_bound(5), 240);
+	// WARN: invalidates `s`
+	x.emplace(s.lower_bound(5), 5);
 	assert(x.begin() != s.begin());
 
 	// safe again
 	s = ordered(x);
 	assert(x.begin() == s.begin());
 
-	const auto z = ordered(x, [](auto a, auto b) {
-		return a < b;
-	});
+	const auto z = ordered<less>(x);
 	assert(s == z);
-
-	assert(ordered(range(x), [](auto a, auto b) {
-		return a < b;
-	}) == s);
+	assert(z.contains(1));
+	assert(z.contains(5));
+	assert(not z.contains(0));
+	assert(not z.contains(6));
+	assert(z.lower_bound(6) == z.end());
+	assert(*z.lower_bound(5) == z.back());
 }
 
 void putTests () {
