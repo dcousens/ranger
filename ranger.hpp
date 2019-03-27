@@ -180,7 +180,7 @@ namespace ranger {
 	}
 
 	template <typename R>
-	auto retro (R& r) {
+	auto reverse (R& r) {
 		using reverse_iterator = std::reverse_iterator<decltype(r.begin())>;
 
 		return __ranger::Range<reverse_iterator>(reverse_iterator(r.end()), reverse_iterator(r.begin()));
@@ -201,7 +201,7 @@ namespace ranger {
 	// rvalue references wrappers
 	template <typename R> auto range (R&& r) { return range<R>(r); }
 	template <typename R> auto ptr_range (R&& r) { return ptr_range<R>(r); }
-	template <typename R> auto retro (R&& r) { return retro<R>(r); }
+	template <typename R> auto reverse (R&& r) { return reverse<R>(r); }
 	template <typename R> auto ordered (R&& r) { return ordered<R>(r); }
 	template <typename F, typename R> auto ordered (R&& r) { return ordered<R, F>(r); }
 }

@@ -107,32 +107,32 @@ void rangeTests3 () {
 // 	assert(b[2] == numbers[2]); // b.size() == 2, fails
 }
 
-void retroTests () {
+void reverseTests () {
 	std::array<uint8_t, 4> expected = {3, 2, 1, 0};
 	std::array<uint8_t, 4> xx = {0, 1, 2, 3};
 	std::array<uint8_t, 4> yy = {0};
 
-	range(yy).put(retro(xx));
+	range(yy).put(reverse(xx));
 	assert(yy == expected);
 
 	yy = {0}; // reset
-	retro(yy).put(range(xx));
+	reverse(yy).put(range(xx));
 	assert(yy == expected);
 
-	retro(retro(yy)).put(retro(xx));
+	reverse(reverse(yy)).put(reverse(xx));
 	assert(yy == expected);
 
 	memmove(yy.data(), xx.data(), yy.size());
 	assert(yy == xx);
 
-	retro(retro(retro(retro(retro(retro(yy)))))).put(retro(range(xx)));
+	reverse(reverse(reverse(reverse(reverse(reverse(yy)))))).put(reverse(range(xx)));
 	assert(yy == expected);
 
 // 	const auto zz = yy;
 // 	memmove(zz.data(), xx.data(), zz.size());
 
 	yy = {9,9,9,9}; // reset
-	auto mm = retro(yy).drop(1);
+	auto mm = reverse(yy).drop(1);
 	range(mm).put(range(xx).drop(1));
 
 	assert(yy[0] == 3);
@@ -141,7 +141,7 @@ void retroTests () {
 	assert(yy[3] == 9);
 
 	yy = {9,9,9,9}; // reset
-	auto nn = retro(range(yy).drop(1));
+	auto nn = reverse(range(yy).drop(1));
 	range(nn).put(range(xx).drop(1));
 
 	assert(yy[0] == 9);
@@ -149,8 +149,8 @@ void retroTests () {
 	assert(yy[2] == 2);
 	assert(yy[3] == 1);
 
-	assert(retro(range(yy)).drop(2).size() == 2);
-	assert(retro(range(yy)).drop(4).size() == 0);
+	assert(reverse(range(yy)).drop(2).size() == 2);
+	assert(reverse(range(yy)).drop(4).size() == 0);
 }
 
 void serialTests () {
@@ -265,7 +265,7 @@ void overloadTests () {
 // 	range(x).data(); // FAILS :)
 	memmove(xr.data(), xr.data(), xr.size()); // OK
 
-	auto rxr = retro(xr);
+	auto rxr = reverse(xr);
 	while (not rxr.empty()) {
 		assert(rxr.back() == xr.front());
 
@@ -363,7 +363,7 @@ int main () {
 	rangeTests2();
 	rangeTests3();
 	iterTests();
-	retroTests();
+	reverseTests();
 	putTests();
 	orderedTests();
 	serialTests();
