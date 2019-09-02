@@ -170,6 +170,11 @@ namespace ranger {
 		return __ranger::Range<pointer>(r.data(), r.data() + r.size());
 	}
 
+	template <typename T>
+	auto unsafe_range (T* begin, T* end) {
+		return __ranger::Range<T*>(begin, end);
+	}
+
 	inline auto zstr_range (const char* z) {
 		using pointer = decltype(z);
 

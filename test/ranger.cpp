@@ -261,9 +261,16 @@ void overloadTests () {
 	assert(xr.size() == 4);
 	assert(xr.back() == 4);
 	assert(xr.begin() == xr.data());
+	assert(xr.data() == x.data());
 
 // 	range(x).data(); // FAILS :)
 	memmove(xr.data(), xr.data(), xr.size()); // OK
+
+	auto xru = unsafe_range(x.data(), x.data() + x.size());
+	assert(xru.size() == 4);
+	assert(xru.back() == 4);
+	assert(xru.begin() == xru.data());
+	assert(xru.data() == x.data());
 
 	auto rxr = reverse(xr);
 	while (not rxr.empty()) {
