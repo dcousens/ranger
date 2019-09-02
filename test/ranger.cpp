@@ -153,7 +153,17 @@ void reverseTests () {
 	assert(reverse(range(yy)).drop(4).size() == 0);
 }
 
+#pragma pack(1)
+struct Foo {
+	uint8_t a, b, c, d;
+
+	bool operator == (const Foo x) const {
+		return a == x.a and b == x.b and c == x.c and d == x.d;
+	}
+};
+
 void serialTests () {
+	const auto aaaa = Foo{ 165, 102, 42, 10 };
 	std::array<uint8_t, 4> a = {165, 102, 42, 10};
 
 	auto x = serial::peek<int32_t>(a);
@@ -161,6 +171,9 @@ void serialTests () {
 
 	auto y = serial::peek<int32_t, true>(a);
 	assert(y == ((a[0] << 24) + (a[1] << 16) + (a[2] << 8) + (a[3] << 0)));
+
+	auto z = serial::peek<Foo>(a);
+	assert(z == aaaa);
 
 	auto r = range(a);
 	serial::read<int32_t>(r);
