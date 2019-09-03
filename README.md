@@ -1,11 +1,11 @@
 # ranger
-A header-only library for wrapping C++ STL iterators in a range-like interface.
+An attempt at a header-only range library for wrapping C++ STL iterators in a range-like interface.
 
 **WARNING:** There is no implicit bounds protection.
 
 The library does have *some* `assert`s internally for debugging purposes,  but you still need to watch out for any undefined behaviour from your iterators,  e.g dereferencing past `end`.
 
-**WARNING:** This library is a work in progress,  please report any bugs!
+**WARNING:** This library is a work in progress,  please report any bugs!  If you need something production safe,  this isn't the library for you.
 
 
 ## Example
