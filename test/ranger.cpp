@@ -383,6 +383,8 @@ void iterTests () {
 
 	auto a = iter_range(start, end);
 
+// 	const auto d = { 5, 7, 9 };
+// 	assert(a == range(d)); // cannot, requires forward_iterator
 // 	printf("%zu\n", a.size()); // destructive!
 	assert(a.front() == 5);
 	a.pop_front();
