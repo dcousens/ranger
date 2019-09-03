@@ -3,6 +3,7 @@
 #include <cstring>
 #include <iostream>
 #include <list>
+#include <forward_list>
 #include <map>
 #include <type_traits>
 #include <vector>
@@ -55,7 +56,8 @@ void rangeTests () {
 	d = d.drop(20);
 	assert(d[0] == a[20]);
 
-// 	auto e = d.drop(100); // oh no! past the end
+	auto e = d.drop(100); // oh no! past the end
+	assert(e.empty());
 // 	e.front(); // undefined behaviour!
 }
 
@@ -270,6 +272,20 @@ void otherUsageTests () {
 		assert(hp[i] == *x);
 		++i;
 	}
+
+	std::forward_list<uint8_t> f;
+	f.push_front(1);
+	f.push_front(2);
+	f.push_front(3);
+
+	assert(range(f) == f);
+	assert(not f.empty());
+	assert(range(f).front() == 3);
+	assert(range(f).drop(1).front() == 2);
+	assert(range(f).drop(2).front() == 1);
+	assert(range(f).drop(3).empty());
+// 	assert(range(f).back()); // should fail instantiation
+// 	assert(range(f).size() == 3); // no matching call
 }
 
 void overloadTests () {
@@ -375,7 +391,7 @@ void iterTests () {
 	assert(a.front() == 9);
 	a.pop_front();
 	assert(a.empty());
-// 	a.pop_front(); // throws
+// 	a.pop_front(); // undefined behavior
 
 	auto b = iter_range(start, end);
 	assert(b.front() == 5); // cached by 'start' iterator...

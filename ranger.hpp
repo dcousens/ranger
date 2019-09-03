@@ -6,11 +6,34 @@
 #include <type_traits>
 
 namespace __ranger {
-	template <typename R>
-	auto drop (R r, const size_t n) {
+	template <
+		typename R,
+		typename U=typename R::iterator,
+		typename T=typename std::iterator_traits<U>::iterator_category
+	> typename std::enable_if<
+		std::is_same_v<T, std::random_access_iterator_tag>,
+		R
+	>::type drop (R r, const size_t n) {
 		auto begin = r.begin();
 		std::advance(begin, n);
+		if (begin > r.end()) return R(r.end(), r.end());
 		return R(begin, r.end());
+	}
+
+	template <
+		typename R,
+		typename U=typename R::iterator,
+		typename T=typename std::iterator_traits<U>::iterator_category
+	> typename std::enable_if<
+		not std::is_same_v<T, std::random_access_iterator_tag>,
+		R
+	>::type drop (R r, const size_t n) {
+		for (size_t i = 0; i < n; i++) {
+			if (r.empty()) break;
+			r.pop_front();
+		}
+
+		return r;
 	}
 
 	template <typename R>
@@ -100,7 +123,6 @@ namespace __ranger {
 			std::is_same_v<T, std::random_access_iterator_tag>,
 			value_type&
 		>::type operator[] (const size_t i) {
-			assert(i < this->size());
 			return this->drop(i).front();
 		}
 
@@ -109,7 +131,6 @@ namespace __ranger {
 			std::is_same_v<T, std::random_access_iterator_tag>,
 			value_type
 		>::type operator[] (const size_t i) const {
-			assert(i < this->size());
 			return this->drop(i).front();
 		}
 
