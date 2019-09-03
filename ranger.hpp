@@ -15,9 +15,7 @@ namespace __ranger {
 
 	template <typename R>
 	auto take (R r, const size_t n) {
-		auto end = r.begin();
-		std::advance(end, n);
-		return R(r.begin(), end);
+		return R(r.begin(), r.drop(n).begin());
 	}
 
 	template <typename R>
@@ -49,6 +47,7 @@ namespace __ranger {
 		I _end;
 
 	public:
+		using iterator = I;
 		using value_type = typename std::remove_const<
 			typename std::remove_reference<decltype(*I())>::type
 		>::type;
@@ -59,11 +58,7 @@ namespace __ranger {
 		auto drop (size_t n) const { return __ranger::drop(*this, n); }
 		auto empty () const { return this->_begin == this->_end; }
 		auto end () const { return this->_end; }
-		auto size () const {
-			const auto diff = std::distance(this->_begin, this->_end);
-			assert(diff >= 0);
-			return static_cast<size_t>(diff);
-		}
+
 		auto take (size_t n) const { return __ranger::take(*this, n); }
 		auto& back () {
 			assert(not this->empty());
@@ -90,18 +85,32 @@ namespace __ranger {
 			return this->_begin;
 		}
 
-		auto& operator[] (const size_t i) {
-			assert(i < this->size());
-			auto it = this->_begin;
-			std::advance(it, i);
-			return *it;
+		template <typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
+		typename std::enable_if<
+			std::is_same_v<T, std::random_access_iterator_tag>,
+			size_t
+		>::type size () const {
+			const auto diff = std::distance(this->_begin, this->_end);
+			assert(diff >= 0);
+			return static_cast<size_t>(diff);
 		}
 
-		auto operator[] (const size_t i) const {
+		template <typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
+		typename std::enable_if<
+			std::is_same_v<T, std::random_access_iterator_tag>,
+			value_type&
+		>::type operator[] (const size_t i) {
 			assert(i < this->size());
-			auto it = this->_begin;
-			std::advance(it, i);
-			return *it;
+			return this->drop(i).front();
+		}
+
+		template <typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
+		typename std::enable_if<
+			std::is_same_v<T, std::random_access_iterator_tag>,
+			value_type
+		>::type operator[] (const size_t i) const {
+			assert(i < this->size());
+			return this->drop(i).front();
 		}
 
 		template <typename E>

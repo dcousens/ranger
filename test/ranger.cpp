@@ -54,6 +54,9 @@ void rangeTests () {
 
 	d = d.drop(20);
 	assert(d[0] == a[20]);
+
+// 	auto e = d.drop(100); // oh no! past the end
+// 	e.front(); // undefined behaviour!
 }
 
 void rangeTests2 () {
@@ -240,9 +243,10 @@ void otherUsageTests () {
 	}
 	printf("\n");
 
-	assert(rm[0].second == 3);
-	assert(rm[1].second == 44);
-	assert(rm[2].second == 555);
+	// fails, map has no random access iterationc
+// 	assert(rm[0].second == 3);
+// 	assert(rm[1].second == 44);
+// 	assert(rm[2].second == 555);
 	// boom (fails on size assertion)
 // 	assert(rm[4].second == 3);
 
@@ -258,6 +262,7 @@ void otherUsageTests () {
 	ls.push_back(0);
 
 	serial::place<uint64_t>(range(ls), h);
+
 	// compare, byte for byte again h
 	size_t i = 0;
 	for (auto x = ls.begin(); x != ls.end(); ++x) {

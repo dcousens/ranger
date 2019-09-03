@@ -22,16 +22,19 @@ namespace serial {
 		static_assert(sizeof(E) % sizeof(T) == 0, "Padding is unsupported");
 
 		constexpr auto count = sizeof(E) / sizeof(T);
-		assert(count <= r.size());
 
 		E value;
 		auto copy = ranger::range(r);
 		auto ptr = reinterpret_cast<T*>(&value);
 
 		if (BE) {
-			for (size_t i = 0; i < count; ++i, copy.pop_front()) ptr[count - 1 - i] = copy.front();
+			for (size_t i = 0; i < count; ++i, copy.pop_front()) {
+				ptr[count - 1 - i] = copy.front();
+			}
 		} else {
-			for (size_t i = 0; i < count; ++i, copy.pop_front()) ptr[i] = copy.front();
+			for (size_t i = 0; i < count; ++i, copy.pop_front()) {
+				ptr[i] = copy.front();
+			}
 		}
 
 		return value;
@@ -45,15 +48,17 @@ namespace serial {
 		static_assert(sizeof(E) % sizeof(T) == 0, "Padding is unsupported");
 
 		constexpr auto count = sizeof(E) / sizeof(T);
-		assert(count <= r.size());
-
 		auto copy = ranger::range(r);
 		auto ptr = reinterpret_cast<const T*>(&e);
 
 		if (BE) {
-			for (size_t i = 0; i < count; ++i, copy.pop_front()) copy.front() = ptr[count - 1 - i];
+			for (size_t i = 0; i < count; ++i, copy.pop_front()) {
+				copy.front() = ptr[count - 1 - i];
+			}
 		} else {
-			for (size_t i = 0; i < count; ++i, copy.pop_front()) copy.front() = ptr[i];
+			for (size_t i = 0; i < count; ++i, copy.pop_front()) {
+				copy.front() = ptr[i];
+			}
 		}
 	}
 
