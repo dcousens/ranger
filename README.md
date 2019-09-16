@@ -33,4 +33,4 @@ auto c = ranger::reverse(b); // {9, 3, 8}
 
 
 ## LICENSE [MIT](LICENSE)
-Inspired by ranges from [D](https://dlang.org/phobos/std_range.html) and functional programming in [Haskell](https://www.haskell.org/).
+Parts of this work are inspired by the concept of ranges as seen in the [D](https://dlang.org/) programming language and typical operations surrounding sublists as seen in the [Haskell](https://www.haskell.org/) programming language.
