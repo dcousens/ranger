@@ -8,8 +8,8 @@
 #include <type_traits>
 #include <vector>
 
-#include "../ranger.hpp"
-#include "../serial.hpp"
+#include "ranger.hpp"
+#include "serial.hpp"
 
 using namespace ranger;
 

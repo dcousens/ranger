@@ -1,25 +1,9 @@
-CXX=clang++
-CFLAGS=-std=c++1z -pedantic -W -Wall -Wcast-qual -Wconversion -Werror -Wextra -Wwrite-strings
-IFLAGS=
-LFLAGS=
+CFLAGS=-std=c++17 -pedantic -Wall -Wextra -Werror -Wunused -Wcast-qual -Wconversion
 OFLAGS=-ggdb3
 
-SOURCES=test/ranger.cpp
-OBJECTS=$(addsuffix .o, $(basename $(SOURCES)))
-DEPENDENCIES=$(OBJECTS:.o=.d)
-
-# COMMANDS
-test: test/ranger
-	./test/ranger
+test: test.cpp ranger.hpp serial.hpp
+	clang++ test.cpp $(CFLAGS) $(OFLAGS) -o $@
+	./test
 
 clean:
-	$(RM) $(DEPENDENCIES) $(OBJECTS) test/ranger
-
-# INFERENCES
-%.o: %.cpp
-	$(CXX) $(CFLAGS) $(OFLAGS) $(IFLAGS) -MMD -MP -c $< -o $@
-
-test/ranger: $(OBJECTS)
-	$(CXX) $(OBJECTS) $(LFLAGS) $(OFLAGS) -o $@
-
--include $(DEPENDENCIES)
+	rm test
