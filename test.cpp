@@ -22,7 +22,7 @@ void printr (const R r) {
 }
 
 void rangeTests () {
-	std::array<uint8_t, 32> a;
+	auto a = std::array<uint8_t, 32>{};
 	for (size_t i = 0; i < a.size(); ++i) a[i] = static_cast<uint8_t>((i * 2) + 1);
 
 	auto b = range(a).drop(10);
@@ -62,7 +62,7 @@ void rangeTests () {
 }
 
 void rangeTests2 () {
-	std::vector<uint8_t> e(60);
+	auto e = std::vector<uint8_t>(60);
 	assert(e.size() == 60);
 	const auto f = range(e).drop(10);
 	assert(f.size() == 50);
@@ -80,14 +80,14 @@ void rangeTests2 () {
 	auto i = range(range(g));
 	assert(i.size() == g.size());
 
-	const std::array<uint8_t, 4> ccc = {0, 1, 2, 3};
+	const auto ccc = std::array<uint8_t, 4>{0, 1, 2, 3};
 	assert(range(ccc) == ccc);
 
 	const auto rrr = range(ccc);
 	assert(rrr == ccc);
 	assert(rrr.size() == ccc.size());
 
-	std::array<uint8_t, 4> yy;
+	auto yy = std::array<uint8_t, 4>{};
 	range(yy).put(range(ccc));
 
 	const auto rrr2 = range(range(rrr));
@@ -96,7 +96,7 @@ void rangeTests2 () {
 
 // README-ish
 void rangeTests3 () {
-	std::vector<int> numbers = {1, 2, 3};
+	auto numbers = std::vector<int>{1, 2, 3};
 
 	auto a = range(numbers).take(2); // {1, 2}
 	a[1] = 8;
@@ -113,9 +113,9 @@ void rangeTests3 () {
 }
 
 void reverseTests () {
-	std::array<uint8_t, 4> expected = {3, 2, 1, 0};
-	std::array<uint8_t, 4> xx = {0, 1, 2, 3};
-	std::array<uint8_t, 4> yy = {0};
+	auto expected = std::array<uint8_t, 4>{3, 2, 1, 0};
+	auto xx = std::array<uint8_t, 4>{0, 1, 2, 3};
+	auto yy = std::array<uint8_t, 4>{0};
 
 	range(yy).put(reverse(xx));
 	assert(yy == expected);
@@ -169,7 +169,7 @@ struct Foo {
 
 void serialTests () {
 	const auto aaaa = Foo{ 165, 102, 42, 10 };
-	std::array<uint8_t, 4> a = {165, 102, 42, 10};
+	auto a = std::array<uint8_t, 4>{165, 102, 42, 10};
 
 	auto x = serial::peek<int32_t>(a);
 	assert(x == ((a[0] << 0) + (a[1] << 8) + (a[2] << 16) + (a[3] << 24)));
@@ -198,7 +198,7 @@ void serialTests () {
 	assert(serial::peek<int16_t>(a) == 890);
 
 	uint32_t value = 0x90ffccde;
-	std::array<uint8_t, 4> expected = {};
+	auto expected = std::array<uint8_t, 4>{};
 	expected[3] = static_cast<uint8_t>(value & 0xff);
 	expected[3 - 1] = static_cast<uint8_t>(value >> 8);
 	expected[3 - 2] = static_cast<uint8_t>(value >> 16);
@@ -206,18 +206,18 @@ void serialTests () {
 	const auto em = serial::peek<uint32_t, true>(expected);
 	assert(em == value);
 
-	std::array<uint8_t, 4> actual = {};
+	auto actual = std::array<uint8_t, 4>{};
 	serial::place<uint32_t, true>(actual, value);
 	const auto am = serial::peek<uint32_t, true>(actual);
 	assert(am == value);
 
 	printr<true>(zstr_range("foobar is foobar"));
 
-	std::array<char, 8> s = {'\0'};
+	auto s = std::array<char, 8>{'\0'};
 	range(s).put(zstr_range("hello"));
 	printr<true>(range(s));
 
-	std::array<uint8_t, 8> ss = {'\0'};
+	auto ss = std::array<uint8_t, 8>{'\0'};
 	auto rss = range(ss);
 	for (auto x : zstr_range("hello")) {
 		rss.put(static_cast<uint8_t>(x));
@@ -230,7 +230,7 @@ void serialTests () {
 }
 
 void otherUsageTests () {
-	std::map<char, int> vs;
+	auto vs = std::map<char, int>{};
 	vs['x'] = 3;
 	vs['y'] = 44;
 	vs['z'] = 555;
@@ -253,7 +253,7 @@ void otherUsageTests () {
 // 	assert(rm[4].second == 3);
 
 	uint64_t h = 0xffff000011110000;
-	std::list<uint8_t> ls;
+	auto ls = std::list<uint8_t>{};
 	ls.push_back(0);
 	ls.push_back(0);
 	ls.push_back(0);
@@ -289,36 +289,36 @@ void otherUsageTests () {
 }
 
 void overloadTests () {
-// 	std::array<uint8_t, 10> x;
-	std::vector<uint8_t> x = {1, 2, 3, 4};
-	auto xr = ptr_range(x);
-	assert(xr.size() == 4);
-	assert(xr.back() == 4);
-	assert(xr.begin() == xr.data());
-	assert(xr.data() == x.data());
+// 	std::array<uint8_t, 10> v;
+	auto v = std::vector<uint8_t>{1, 2, 3, 4};
+	auto vr = ptr_range(v);
+	assert(vr.size() == 4);
+	assert(vr.back() == 4);
+	assert(vr.begin() == vr.data());
+	assert(vr.data() == v.data());
 
-// 	range(x).data(); // FAILS :)
-	memmove(xr.data(), xr.data(), xr.size()); // OK
+// 	range(v).data(); // FAILS :)
+	memmove(vr.data(), vr.data(), vr.size()); // OK
 
-	auto xru = unsafe_range(x.data(), x.data() + x.size());
-	assert(xru.size() == 4);
-	assert(xru.back() == 4);
-	assert(xru.begin() == xru.data());
-	assert(xru.data() == x.data());
+	auto vru = unsafe_range(v.data(), v.data() + v.size());
+	assert(vru.size() == 4);
+	assert(vru.back() == 4);
+	assert(vru.begin() == vru.data());
+	assert(vru.data() == v.data());
 
-	auto rxr = reverse(xr);
-	while (not rxr.empty()) {
-		assert(rxr.back() == xr.front());
+	auto rvr = reverse(vr);
+	while (not rvr.empty()) {
+		assert(rvr.back() == vr.front());
 
-		xr.pop_front();
-		rxr.pop_back();
+		vr.pop_front();
+		rvr.pop_back();
 	}
 
-	assert(xr.size() == 0);
-	assert(rxr.size() == 0);
+	assert(vr.size() == 0);
+	assert(rvr.size() == 0);
 
 	// TODO
-// 	xr.put(10);
+// 	vr.put(10);
 }
 
 struct less {
@@ -329,9 +329,9 @@ struct less {
 };
 
 void orderedTests () {
-	std::vector<uint8_t> x = {1, 2, 3, 4};
+	auto v = std::vector<uint8_t>{1, 2, 3, 4};
 
-	auto s = ordered(x);
+	auto s = ordered(v);
 	assert(s.contains(1));
 	assert(s.contains(3));
 	assert(s.contains(4));
@@ -339,17 +339,17 @@ void orderedTests () {
 	assert(not s.contains(5));
 	assert(s.lower_bound(5) == s.end());
 
-	assert(x.begin() == s.begin());
+	assert(v.begin() == s.begin());
 	// WARN: invalidates `s`
-	x.emplace(s.lower_bound(5), 5);
-	assert(x.begin() != s.begin());
+	v.emplace(s.lower_bound(5), 5);
+	assert(v.begin() != s.begin());
 
 	// safe again
-	s = ordered(x);
-	assert(x.begin() == s.begin());
+	s = ordered(v);
+	assert(v.begin() == s.begin());
 
-	const auto z = ordered<less>(x);
-	assert(s == z);
+	const auto z = ordered<less>(v);
+// 	assert(z == s);
 	assert(z.contains(1));
 	assert(z.contains(5));
 	assert(not z.contains(0));
@@ -359,17 +359,17 @@ void orderedTests () {
 }
 
 void putTests () {
-	std::vector<uint32_t> x = {1, 2, 3, 4};
-	auto save = range(x);
+	auto v = std::vector<uint32_t>{1, 2, 3, 4};
+	auto save = range(v);
 
 	save.put(11u);
 	save.put(9u);
 	save.put(7u);
 	save.put(5u);
-	assert(x[0] == 11);
-	assert(x[1] == 9);
-	assert(x[2] == 7);
-	assert(x[3] == 5);
+	assert(v[0] == 11);
+	assert(v[1] == 9);
+	assert(v[2] == 7);
+	assert(v[3] == 5);
 }
 
 #include <iostream>
@@ -377,9 +377,9 @@ void putTests () {
 #include <sstream>
 
 void iterTests () {
-	std::stringstream ss{"5 7 9"};
-	std::istream_iterator<int> start{ss};
-	std::istream_iterator<int> end;
+	auto ss = std::stringstream{"5 7 9"};
+	auto start = std::istream_iterator<int>{ss};
+	auto end = std::istream_iterator<int>{};
 
 	auto a = iter_range(start, end);
 
