@@ -114,7 +114,7 @@ namespace __ranger {
 			size_t
 		> size () const {
 			const auto diff = std::distance(this->_begin, this->_end);
-			assert(diff >= 0);
+			if (std::is_signed<decltype(diff)>::value) assert(diff >= 0);
 			return static_cast<size_t>(diff);
 		}
 
