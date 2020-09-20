@@ -1,4 +1,4 @@
-CFLAGS=-std=c++17 -pedantic -Wall -Wextra -Werror -Wunused -Wcast-qual -Wconversion
+CFLAGS=-std=c++17 -pedantic -Wall -Wextra -Wno-sign-compare
 OFLAGS=-ggdb3
 
 .PHONY: test
