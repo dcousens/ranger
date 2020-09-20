@@ -300,7 +300,7 @@ void overloadTests () {
 // 	range(v).data(); // FAILS :)
 	memmove(vr.data(), vr.data(), vr.size()); // OK
 
-	auto vru = unsafe_range(v.data(), v.data() + v.size());
+	auto vru = range(v.data(), v.data() + v.size());
 	assert(vru.size() == 4);
 	assert(vru.back() == 4);
 	assert(vru.begin() == vru.data());
@@ -381,7 +381,7 @@ void iterTests () {
 	auto start = std::istream_iterator<int>{ss};
 	auto end = std::istream_iterator<int>{};
 
-	auto a = iter_range(start, end);
+	auto a = range(start, end);
 
 // 	const auto d = { 5, 7, 9 };
 // 	assert(a == range(d)); // cannot, requires forward_iterator
@@ -398,7 +398,7 @@ void iterTests () {
 	assert(a.empty());
 // 	a.pop_front(); // undefined behavior
 
-	auto b = iter_range(start, end);
+	auto b = range(start, end);
 	assert(b.front() == 5); // cached by 'start' iterator...
 	b.pop_front();
 	assert(b.empty()); // stringstream is depleted

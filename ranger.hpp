@@ -187,44 +187,35 @@ namespace __ranger {
 }
 
 namespace ranger {
+	template <typename I> using range_t = __ranger::Range<I>;
+
+	template <typename I>
+	auto range (I begin, I end) {
+		return range_t<I>(begin, end);
+	}
+
 	template <typename R>
 	auto range (R& r) {
 		using iterator = decltype(r.begin());
-
-		return __ranger::Range<iterator>(r.begin(), r.end());
-	}
-
-	template <typename I>
-	auto iter_range (I& begin, I& end) {
-		return __ranger::Range<I>(begin, end);
+		return range_t<iterator>(r.begin(), r.end());
 	}
 
 	template <typename R>
 	auto ptr_range (R& r) {
 		using pointer = decltype(r.data());
-
-		return __ranger::Range<pointer>(r.data(), r.data() + r.size());
-	}
-
-	template <typename T>
-	auto unsafe_range (T* begin, T* end) {
-		return __ranger::Range<T*>(begin, end);
+		return range_t<pointer>(r.data(), r.data() + r.size());
 	}
 
 	inline auto zstr_range (const char* z) {
-		using pointer = decltype(z);
-
 		auto r = z;
 		while (*r != '\0') r++;
-
-		return __ranger::Range<pointer>(z, r);
+		return range(z, r);
 	}
 
 	template <typename R>
 	auto reverse (R& r) {
 		using reverse_iterator = std::reverse_iterator<decltype(r.begin())>;
-
-		return __ranger::Range<reverse_iterator>(reverse_iterator(r.end()), reverse_iterator(r.begin()));
+		return range(reverse_iterator(r.end()), reverse_iterator(r.begin()));
 	}
 
 	template <typename F, typename R>
@@ -241,7 +232,6 @@ namespace ranger {
 
 	// rvalue references wrappers
 	template <typename R> auto range (R&& r) { return range<R>(r); }
-	template <typename I> auto iter_range (I&& begin, I&& end) { return iter_range<I>(begin, end); }
 	template <typename R> auto ptr_range (R&& r) { return ptr_range<R>(r); }
 	template <typename R> auto reverse (R&& r) { return reverse<R>(r); }
 	template <typename R> auto ordered (R&& r) { return ordered<R>(r); }
