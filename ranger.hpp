@@ -6,10 +6,61 @@
 #include <type_traits>
 
 namespace __ranger {
+	template <
+		typename R,
+		typename U=typename R::iterator,
+		typename T=typename std::iterator_traits<U>::iterator_category
+	> typename std::enable_if_t<
+		std::is_same<std::random_access_iterator_tag, T>::value,
+		R
+	> drop_back (const R r, const size_t n) {
+		auto end = r.end();
+		std::advance(end, -n);
+		if (end < r.begin()) return R(r.begin(), r.begin());
+		return R(r.begin(), end);
+	}
+
+	template <
+		typename R,
+		typename U=typename R::iterator,
+		typename T=typename std::iterator_traits<U>::iterator_category
+	> typename std::enable_if_t<
+		not std::is_same<std::random_access_iterator_tag, T>::value,
+		R
+	> drop_back (R r, const size_t n) {
+		for (size_t i = 0; i < n; i++) {
+			if (r.empty()) break;
+			r.pop_back();
+		}
+
+		return r;
+	}
+
+	template <typename R>
+	auto take (const R r, const size_t n) {
+		return R(r.begin(), r.drop(n).begin());
+	}
+
 	template <typename R>
 	void put (R& r, typename R::value_type e) {
 		r.front() = e;
 		r.pop_front();
+	}
+
+	template <typename R, typename F>
+	auto drop_until (R r, const F f) {
+		while (not r.empty()) {
+			if (f(r.front())) break;
+			r.pop_front();
+		}
+
+		return r;
+	}
+
+	template <typename R, typename F>
+	auto take_until (R r, const F f) {
+		auto d = drop_until(r, f);
+		return r.take(r.size() - d.size());
 	}
 
 	template <
@@ -60,6 +111,23 @@ namespace __ranger {
 		auto take (const size_t n) const {
 			return Range(this->_begin, this->drop(n).begin());
 		}
+
+		auto drop_back (const size_t n) const {
+			auto it = this->_end;
+			std::advance(it, -n);
+
+			if constexpr(std::is_same<std::random_access_iterator_tag, typename std::iterator_traits<I>::iterator_category>::value) {
+				if (it < this->_begin) return Range(this->_begin, this->_begin);
+			}
+
+			return Range(this->_begin, it);
+		}
+
+		template <typename F>
+		auto drop_until (const F f) const { return __ranger::drop_until(*this, f); }
+
+		template <typename F>
+		auto take_until (const F f) const { return __ranger::take_until(*this, f); }
 
 		auto& back () {
 			assert(not this->empty());
@@ -132,13 +200,32 @@ namespace __ranger {
 
 		// mutators
 		void pop_back () {
-			assert(not this->empty());
+			if (this->empty()) return;
 			std::advance(this->_end, -1);
 		}
 
+		auto pop_back (const size_t n) {
+			auto save = this->_end;
+			*this = this->drop_back(n);
+			return Range(this->_end, save);
+		}
+
 		void pop_front () {
-			assert(not this->empty());
+			if (this->empty()) return;
 			std::advance(this->_begin, 1);
+		}
+
+		auto pop_front (const size_t n) {
+			auto save = this->_begin;
+			*this = this->drop(n);
+			return Range(save, this->_begin);
+		}
+
+		template <typename F>
+		auto pop_until (const F f) {
+			auto save = this->_begin;
+			*this = this->drop_until(f);
+			return Range(save, this->_begin);
 		}
 
 		template <typename E>

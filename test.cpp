@@ -112,6 +112,44 @@ void rangeTests3 () {
 // 	assert(b[2] == numbers[2]); // b.size() == 2, fails
 }
 
+void untilTests () {
+	auto numbers = std::vector<int>{1, 2, 3, 4, 5, 6};
+
+	auto du3 = range(numbers).drop_until([](auto x) { return x == 3; });
+	assert(du3[0] == 3);
+	assert(du3.size() == 4);
+
+	auto du4 = range(numbers).drop_until([](auto x) { return x == 4; });
+	assert(du4[0] == 4);
+	assert(du4.size() == 3);
+
+	auto tu4 = range(numbers).take_until([](auto x) { return x == 5; });
+	assert(tu4[0] == 1);
+	assert(tu4.size() == 4);
+}
+
+void popTests () {
+	auto numbers = std::vector<int>{1, 2, 3, 4, 5, 6};
+
+	auto a = range(numbers);
+	auto af = a.pop_front(3);
+
+	assert(af == range(numbers).take(3));
+	assert( a == range(numbers).drop(3));
+
+	auto b = range(numbers);
+	auto bb = b.pop_back(3);
+
+	assert(bb == range(numbers).drop(3));
+	assert( b == range(numbers).take(3));
+
+	auto c = range(numbers);
+	auto cf = c.pop_until([](auto x) { return x == 4; });
+
+	assert(cf == range(numbers).take(3));
+	assert( c == range(numbers).drop(3));
+}
+
 void reverseTests () {
 	auto expected = std::array<uint8_t, 4>{3, 2, 1, 0};
 	auto xx = std::array<uint8_t, 4>{0, 1, 2, 3};
@@ -423,6 +461,8 @@ int main () {
 	rangeTests();
 	rangeTests2();
 	rangeTests3();
+	popTests();
+	untilTests();
 	iterTests();
 	reverseTests();
 	putTests();
