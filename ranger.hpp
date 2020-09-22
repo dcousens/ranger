@@ -6,41 +6,6 @@
 #include <type_traits>
 
 namespace __ranger {
-	template <
-		typename R,
-		typename U=typename R::iterator,
-		typename T=typename std::iterator_traits<U>::iterator_category
-	> typename std::enable_if_t<
-		std::is_same<std::random_access_iterator_tag, T>::value,
-		R
-	> drop (R r, const size_t n) {
-		auto begin = r.begin();
-		std::advance(begin, n);
-		if (begin > r.end()) return R(r.end(), r.end());
-		return R(begin, r.end());
-	}
-
-	template <
-		typename R,
-		typename U=typename R::iterator,
-		typename T=typename std::iterator_traits<U>::iterator_category
-	> typename std::enable_if_t<
-		not std::is_same<std::random_access_iterator_tag, T>::value,
-		R
-	> drop (R r, const size_t n) {
-		for (size_t i = 0; i < n; i++) {
-			if (r.empty()) break;
-			r.pop_front();
-		}
-
-		return r;
-	}
-
-	template <typename R>
-	auto take (R r, const size_t n) {
-		return R(r.begin(), r.drop(n).begin());
-	}
-
 	template <typename R>
 	void put (R& r, typename R::value_type e) {
 		r.front() = e;
@@ -78,11 +43,24 @@ namespace __ranger {
 		Range (I begin, I end) : _begin(begin), _end(end) {}
 
 		auto begin () const { return this->_begin; }
-		auto drop (size_t n) const { return __ranger::drop(*this, n); }
 		auto empty () const { return this->_begin == this->_end; }
 		auto end () const { return this->_end; }
 
-		auto take (size_t n) const { return __ranger::take(*this, n); }
+		auto drop (const size_t n) const {
+			auto it = this->_begin;
+			std::advance(it, n);
+
+			if constexpr(std::is_same<std::random_access_iterator_tag, typename std::iterator_traits<I>::iterator_category>::value) {
+				if (it > this->_end) return Range(this->_end, this->_end);
+			}
+
+			return Range(it, this->_end);
+		}
+
+		auto take (const size_t n) const {
+			return Range(this->_begin, this->drop(n).begin());
+		}
+
 		auto& back () {
 			assert(not this->empty());
 			return *(this->_end - 1);
@@ -114,7 +92,9 @@ namespace __ranger {
 			size_t
 		> size () const {
 			const auto diff = std::distance(this->_begin, this->_end);
-			if (std::is_signed<decltype(diff)>::value) assert(diff >= 0);
+			if constexpr(std::is_signed<decltype(diff)>::value) {
+				assert(diff >= 0);
+			}
 			return static_cast<size_t>(diff);
 		}
 

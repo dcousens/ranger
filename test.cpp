@@ -219,8 +219,8 @@ void serialTests () {
 
 	auto ss = std::array<uint8_t, 8>{'\0'};
 	auto rss = range(ss);
-	for (auto x : zstr_range("hello")) {
-		rss.put(static_cast<uint8_t>(x));
+	for (auto c : zstr_range("hello")) {
+		rss.put(static_cast<uint8_t>(c));
 	}
 	printr<true>(range(ss));
 
@@ -377,8 +377,8 @@ void putTests () {
 #include <sstream>
 
 void iterTests () {
-	auto ss = std::stringstream{"5 7 9"};
-	auto start = std::istream_iterator<int>{ss};
+	auto stream = std::stringstream{"5 7 9"};
+	auto start = std::istream_iterator<int>{stream};
 	auto end = std::istream_iterator<int>{};
 
 	auto a = range(start, end);
@@ -386,13 +386,13 @@ void iterTests () {
 // 	const auto d = { 5, 7, 9 };
 // 	assert(a == range(d)); // cannot, requires forward_iterator
 // 	printf("%zu\n", a.size()); // destructive!
-	assert(ss.good());
+	assert(stream.good());
 	assert(a.front() == 5);
 	a.pop_front();
-	assert(ss.good());
+	assert(stream.good());
 	assert(a.front() == 7);
 	a.pop_front();
-	assert(ss.eof());
+	assert(stream.eof());
 	assert(a.front() == 9);
 	a.pop_front();
 	assert(a.empty());
@@ -402,6 +402,21 @@ void iterTests () {
 	assert(b.front() == 5); // cached by 'start' iterator...
 	b.pop_front();
 	assert(b.empty()); // stringstream is depleted
+
+	auto streamb = std::stringstream{"5 7 9"};
+	auto c = range(std::istream_iterator<int>{streamb}, std::istream_iterator<int>{});
+	assert(streamb.good());
+
+	auto d = c.drop(1); // drops the front
+	assert(d.front() == 7);
+	assert(d.front() == 7); // cached by 'start' iterator...
+
+	auto e = c.drop(20);
+	assert(e.empty());
+
+	d.pop_front();
+	assert(d.empty()); // depleted by e
+	assert(streamb.eof());
 }
 
 int main () {
