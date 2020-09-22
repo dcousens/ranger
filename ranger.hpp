@@ -16,7 +16,7 @@ namespace __ranger {
 		typename R,
 		typename E,
 		typename V = typename std::enable_if_t<
-			std::is_same<typename R::value_type, typename E::value_type>::value,
+			std::is_same_v<typename R::value_type, typename E::value_type>,
 			E
 		>
 	>
@@ -50,7 +50,7 @@ namespace __ranger {
 			auto it = this->_begin;
 			std::advance(it, n);
 
-			if constexpr(std::is_same<std::random_access_iterator_tag, typename std::iterator_traits<I>::iterator_category>::value) {
+			if constexpr(std::is_same_v<std::random_access_iterator_tag, typename std::iterator_traits<I>::iterator_category>) {
 				if (it > this->_end) return Range(this->_end, this->_end);
 			}
 
@@ -82,13 +82,13 @@ namespace __ranger {
 		}
 
 		template <typename U=I>
-		typename std::enable_if_t<std::is_pointer<U>::value, I> data () {
+		typename std::enable_if_t<std::is_pointer_v<U>, I> data () {
 			return this->_begin;
 		}
 
 		template <typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
 		typename std::enable_if_t<
-			std::is_same<std::random_access_iterator_tag, T>::value,
+			std::is_same_v<std::random_access_iterator_tag, T>,
 			size_t
 		> size () const {
 			const auto diff = std::distance(this->_begin, this->_end);
@@ -100,7 +100,7 @@ namespace __ranger {
 
 		template <typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
 		typename std::enable_if_t<
-			std::is_same<std::random_access_iterator_tag, T>::value,
+			std::is_same_v<std::random_access_iterator_tag, T>,
 			value_type&
 		> operator[] (const size_t i) {
 			return this->drop(i).front();
@@ -108,7 +108,7 @@ namespace __ranger {
 
 		template <typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
 		typename std::enable_if_t<
-			std::is_same<std::random_access_iterator_tag, T>::value,
+			std::is_same_v<std::random_access_iterator_tag, T>,
 			value_type
 		> operator[] (const size_t i) const {
 			return this->drop(i).front();
@@ -116,7 +116,7 @@ namespace __ranger {
 
 		template <typename E, typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
 		typename std::enable_if_t<
-			std::is_base_of<std::forward_iterator_tag, T>::value,
+			std::is_base_of_v<std::forward_iterator_tag, T>,
 			bool
 		> operator< (const E& rhs) const {
 			return std::lexicographical_compare(this->begin(), this->end(), rhs.begin(), rhs.end());
@@ -124,7 +124,7 @@ namespace __ranger {
 
 		template <typename E, typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
 		typename std::enable_if_t<
-			std::is_base_of<std::forward_iterator_tag, T>::value,
+			std::is_base_of_v<std::forward_iterator_tag, T>,
 			bool
 		> operator== (const E& rhs) const {
 			return std::equal(this->begin(), this->end(), rhs.begin(), rhs.end());
