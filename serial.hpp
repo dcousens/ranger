@@ -41,7 +41,7 @@ namespace serial {
 	}
 
 	template <typename E, bool BE = false, typename R>
-	void place (R& r, const E e) {
+	void place (R& r, const E value) {
 		using T = typename R::value_type;
 
 		static_assert(std::is_same<T, uint8_t>::value, "Expected uint8_t elements");
@@ -49,7 +49,7 @@ namespace serial {
 
 		constexpr auto count = sizeof(E) / sizeof(T);
 		auto copy = ranger::range(r);
-		auto ptr = reinterpret_cast<const T*>(&e);
+		auto ptr = reinterpret_cast<const T*>(&value);
 
 		if (BE) {
 			for (size_t i = 0; i < count; ++i, copy.pop_front()) {
