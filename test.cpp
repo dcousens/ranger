@@ -89,9 +89,15 @@ void rangeTests2 () {
 
 	auto yy = std::array<uint8_t, 4>{};
 	range(yy).put(range(ccc));
+	assert(range(yy) == ccc);
 
 	const auto rrr2 = range(range(rrr));
 	assert(rrr2.size() == ccc.size());
+
+	auto yyr = range(yy);
+	assert(yyr.size() == 4);
+	yyr.put(range(ccc));
+	assert(yyr.size() == 0);
 }
 
 // README-ish
