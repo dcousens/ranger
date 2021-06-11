@@ -1,8 +1,6 @@
 CFLAGS=$(shell cat compile_flags.txt)
 
-.PHONY: test
-
-test: test.cpp
+test: test.cpp ranger.hpp
 	clang++ $(CFLAGS) -ggdb3 $< -o $@
 	./test
 

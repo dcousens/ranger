@@ -6,47 +6,6 @@
 #include <type_traits>
 
 namespace __ranger {
-	template <
-		typename R,
-		typename U=typename R::iterator,
-		typename T=typename std::iterator_traits<U>::iterator_category
-	> typename std::enable_if_t<
-		std::is_same<std::random_access_iterator_tag, T>::value,
-		R
-	> drop_back (const R r, const size_t n) {
-		auto end = r.end();
-		std::advance(end, -n);
-		if (end < r.begin()) return R(r.begin(), r.begin());
-		return R(r.begin(), end);
-	}
-
-	template <
-		typename R,
-		typename U=typename R::iterator,
-		typename T=typename std::iterator_traits<U>::iterator_category
-	> typename std::enable_if_t<
-		not std::is_same<std::random_access_iterator_tag, T>::value,
-		R
-	> drop_back (R r, const size_t n) {
-		for (size_t i = 0; i < n; i++) {
-			if (r.empty()) break;
-			r.pop_back();
-		}
-
-		return r;
-	}
-
-	template <typename R>
-	auto take (const R r, const size_t n) {
-		return R(r.begin(), r.drop(n).begin());
-	}
-
-	template <typename R>
-	void put (R& r, typename R::value_type e) {
-		r.front() = e;
-		r.pop_front();
-	}
-
 	template <typename R, typename F>
 	auto drop_until (R r, const F f) {
 		while (not r.empty()) {
@@ -57,10 +16,10 @@ namespace __ranger {
 		return r;
 	}
 
-	template <typename R, typename F>
-	auto take_until (R r, const F f) {
-		auto d = drop_until(r, f);
-		return r.take(r.size() - d.size());
+	template <typename R>
+	void put (R& r, typename R::value_type e) {
+		r.front() = e;
+		r.pop_front();
 	}
 
 	template <
@@ -90,6 +49,7 @@ namespace __ranger {
 		using value_type = typename std::remove_const_t<
 			typename std::remove_reference_t<decltype(*I())>
 		>;
+		using distance_type = decltype(std::distance(I(), I()));
 
 		Range (I begin, I end) : _begin(begin), _end(end) {}
 
@@ -97,10 +57,14 @@ namespace __ranger {
 		auto empty () const { return this->_begin == this->_end; }
 		auto end () const { return this->_end; }
 
-		auto drop (const size_t n) const {
+		auto drop (const size_t un) const {
+			const auto n = static_cast<distance_type>(un);
+			if constexpr(std::is_signed<distance_type>::value) {
+				assert(n >= 0);
+			}
+
 			auto it = this->_begin;
 			std::advance(it, n);
-
 			if constexpr(std::is_same_v<std::random_access_iterator_tag, typename std::iterator_traits<I>::iterator_category>) {
 				if (it > this->_end) return Range(this->_end, this->_end);
 			}
@@ -108,14 +72,14 @@ namespace __ranger {
 			return Range(it, this->_end);
 		}
 
-		auto take (const size_t n) const {
-			return Range(this->_begin, this->drop(n).begin());
-		}
+		auto drop_back (const size_t un) const {
+			const auto n = static_cast<distance_type>(un);
+			if constexpr(std::is_signed<distance_type>::value) {
+				assert(n >= 0);
+			}
 
-		auto drop_back (const size_t n) const {
 			auto it = this->_end;
 			std::advance(it, -n);
-
 			if constexpr(std::is_same<std::random_access_iterator_tag, typename std::iterator_traits<I>::iterator_category>::value) {
 				if (it < this->_begin) return Range(this->_begin, this->_begin);
 			}
@@ -124,10 +88,19 @@ namespace __ranger {
 		}
 
 		template <typename F>
-		auto drop_until (const F f) const { return __ranger::drop_until(*this, f); }
+		auto drop_until (const F f) const {
+			return __ranger::drop_until(*this, f);
+		}
+
+		auto take (const size_t n) const {
+			return Range(this->_begin, this->drop(n).begin());
+		}
 
 		template <typename F>
-		auto take_until (const F f) const { return __ranger::take_until(*this, f); }
+		auto take_until (const F f) const {
+			auto save  = this->drop_until(f);
+			return Range(this->_begin, save.begin());
+		}
 
 		auto& back () {
 			assert(not this->empty());
@@ -154,19 +127,16 @@ namespace __ranger {
 			return this->_begin;
 		}
 
-		template <typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
+		template <typename T=typename std::iterator_traits<I>::iterator_category>
 		typename std::enable_if_t<
 			std::is_same_v<std::random_access_iterator_tag, T>,
 			size_t
 		> size () const {
-			const auto diff = std::distance(this->_begin, this->_end);
-			if constexpr(std::is_signed<decltype(diff)>::value) {
-				assert(diff >= 0);
-			}
-			return static_cast<size_t>(diff);
+			assert(this->_end >= this->_begin);
+			return static_cast<size_t>(std::distance(this->_begin, this->_end));
 		}
 
-		template <typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
+		template <typename T=typename std::iterator_traits<I>::iterator_category>
 		typename std::enable_if_t<
 			std::is_same_v<std::random_access_iterator_tag, T>,
 			value_type&
@@ -174,7 +144,7 @@ namespace __ranger {
 			return this->drop(i).front();
 		}
 
-		template <typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
+		template <typename T=typename std::iterator_traits<I>::iterator_category>
 		typename std::enable_if_t<
 			std::is_same_v<std::random_access_iterator_tag, T>,
 			value_type
@@ -182,7 +152,7 @@ namespace __ranger {
 			return this->drop(i).front();
 		}
 
-		template <typename E, typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
+		template <typename E, typename T=typename std::iterator_traits<I>::iterator_category>
 		typename std::enable_if_t<
 			std::is_base_of_v<std::forward_iterator_tag, T>,
 			bool
@@ -190,7 +160,7 @@ namespace __ranger {
 			return std::lexicographical_compare(this->begin(), this->end(), rhs.begin(), rhs.end());
 		}
 
-		template <typename E, typename U=I, typename T=typename std::iterator_traits<U>::iterator_category>
+		template <typename E, typename T=typename std::iterator_traits<I>::iterator_category>
 		typename std::enable_if_t<
 			std::is_base_of_v<std::forward_iterator_tag, T>,
 			bool

@@ -57,7 +57,7 @@ void rangeTests () {
 	assert(d[0] == a[20]);
 
 	auto e = d.drop(100); // oh no! past the end
-	assert(e.empty());
+	assert(e.empty()); // thats OK
 // 	e.front(); // undefined behaviour!
 }
 
@@ -118,6 +118,17 @@ void rangeTests3 () {
 // 	assert(b[2] == numbers[2]); // b.size() == 2, fails
 }
 
+// signed distance tests
+void signedDistanceTests () {
+	auto numbers = std::vector<int>{1, 2, 3};
+	assert(range(numbers).drop_back(10).empty());
+	assert(range(numbers).drop_back(10).end() == numbers.begin());
+
+	// Wconversion warnings, and inner assert fails
+// 	assert(range(numbers).drop_back(-10).empty());
+// 	assert(range(numbers).drop_back(-10).end() == numbers.begin());
+}
+
 void untilTests () {
 	auto numbers = std::vector<int>{1, 2, 3, 4, 5, 6};
 
@@ -154,6 +165,12 @@ void popTests () {
 
 	assert(cf == range(numbers).take(3));
 	assert( c == range(numbers).drop(3));
+
+	auto d = range(numbers);
+	auto df = d.pop_until([](auto x) { return x == 9; }); // doesn't exist
+
+	assert(df == range(numbers));
+	assert( d == range(numbers).drop(6));
 }
 
 void reverseTests () {
@@ -477,6 +494,7 @@ int main () {
 	otherUsageTests();
 	overloadTests();
 	orderedTests();
+	signedDistanceTests();
 
 	return 0;
 }

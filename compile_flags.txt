@@ -2,4 +2,5 @@
 -pedantic
 -Wall
 -Wextra
+-Wconversion
 -Wno-sign-compare
