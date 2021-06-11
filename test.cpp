@@ -121,12 +121,18 @@ void rangeTests3 () {
 // signed distance tests
 void signedDistanceTests () {
 	auto numbers = std::vector<int>{1, 2, 3};
+
+	assert(range(numbers).drop(10).empty());
+	assert(range(numbers).drop(10).end() == numbers.end());
 	assert(range(numbers).drop_back(10).empty());
 	assert(range(numbers).drop_back(10).end() == numbers.begin());
 
+	assert(range(numbers).drop(10).take(10).empty());
+	assert(range(numbers).drop(10).take(10).end() == numbers.end());
+
 	// Wconversion warnings, and inner assert fails
 // 	assert(range(numbers).drop_back(-10).empty());
-// 	assert(range(numbers).drop_back(-10).end() == numbers.begin());
+// 	assert(range(numbers).drop(-10).empty());
 }
 
 void untilTests () {
