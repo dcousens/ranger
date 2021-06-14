@@ -50,8 +50,13 @@ namespace __ranger {
 			typename std::remove_reference_t<decltype(*I())>
 		>;
 		using distance_type = decltype(std::distance(I(), I()));
+		using random_access = std::is_same<std::random_access_iterator_tag, typename std::iterator_traits<I>::iterator_category>;
 
-		Range (I begin, I end) : _begin(begin), _end(end) {}
+		Range (I begin, I end) : _begin(begin), _end(end) {
+			if constexpr(random_access::value) {
+				assert(end >= begin);
+			}
+		}
 
 		auto begin () const { return this->_begin; }
 		auto empty () const { return this->_begin == this->_end; }
@@ -65,7 +70,7 @@ namespace __ranger {
 
 			auto it = this->_begin;
 			std::advance(it, n);
-			if constexpr(std::is_same_v<std::random_access_iterator_tag, typename std::iterator_traits<I>::iterator_category>) {
+			if constexpr(random_access::value) {
 				if (it > this->_end) return Range(this->_end, this->_end);
 			}
 
@@ -80,7 +85,7 @@ namespace __ranger {
 
 			auto it = this->_end;
 			std::advance(it, -n);
-			if constexpr(std::is_same<std::random_access_iterator_tag, typename std::iterator_traits<I>::iterator_category>::value) {
+			if constexpr(random_access::value) {
 				if (it < this->_begin) return Range(this->_begin, this->_begin);
 			}
 
@@ -96,9 +101,14 @@ namespace __ranger {
 			return Range(this->_begin, this->drop(n).begin());
 		}
 
+		auto take_back (const size_t un) const {
+			const auto copy = this->drop_back(un);
+			return Range(copy._end, this->_end);
+		}
+
 		template <typename F>
 		auto take_until (const F f) const {
-			auto save  = this->drop_until(f);
+			auto save = this->drop_until(f);
 			return Range(this->_begin, save.begin());
 		}
 

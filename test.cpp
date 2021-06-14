@@ -130,6 +130,12 @@ void signedDistanceTests () {
 	assert(range(numbers).drop(10).take(10).empty());
 	assert(range(numbers).drop(10).take(10).end() == numbers.end());
 
+	assert(range(numbers).take_back(3).size() == 3);
+	assert(range(numbers).take_back(10).size() == 3);
+	assert(range(numbers).take_back(10) == range(numbers));
+	assert(range(numbers).take_back(1) == range(numbers).drop(2));
+	assert(range(numbers).take_back(2) == range(numbers).drop(1));
+
 	// Wconversion warnings, and inner assert fails
 // 	assert(range(numbers).drop_back(-10).empty());
 // 	assert(range(numbers).drop(-10).empty());
