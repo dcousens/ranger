@@ -368,36 +368,36 @@ void otherUsageTests () {
 }
 
 void overloadTests () {
-// 	std::array<uint8_t, 10> v;
 	auto v = std::vector<uint8_t>{1, 2, 3, 4};
-	auto vr = ptr_range(v);
-	assert(vr.size() == 4);
-	assert(vr.back() == 4);
-	assert(vr.begin() == vr.data());
-	assert(vr.data() == v.data());
+	auto vp = ptr_range(v);
+	assert(vp.size() == 4);
+	assert(vp.back() == 4);
+	assert(vp.begin() == vp.data());
+	assert(vp.data() == v.data());
 
-// 	range(v).data(); // FAILS :)
-	memmove(vr.data(), vr.data(), vr.size()); // OK
+	// range(v).data(); // error: no matching function
+	memmove(vp.data(), vp.data(), vp.size()); // OK
 
-	auto vru = range(v.data(), v.data() + v.size());
-	assert(vru.size() == 4);
-	assert(vru.back() == 4);
-	assert(vru.begin() == vru.data());
-	assert(vru.data() == v.data());
+	auto vpu = range(v.data(), v.data() + v.size());
+	assert(vpu.size() == 4);
+	assert(vpu.back() == 4);
+	assert(vpu.begin() == vpu.data());
+	assert(vpu.data() == v.data());
 
-	auto rvr = reverse(vr);
-	while (not rvr.empty()) {
-		assert(rvr.back() == vr.front());
+	auto rvp = reverse(vp);
+	while (not rvp.empty()) {
+		assert(rvp.back() == vp.front());
 
-		vr.pop_front();
-		rvr.pop_back();
+		vp.pop_front();
+		rvp.pop_back();
 	}
 
-	assert(vr.size() == 0);
-	assert(rvr.size() == 0);
+	assert(vp.size() == 0);
+	assert(rvp.size() == 0);
 
-	// TODO
-// 	vr.put(10);
+	auto vp2 = range(v);
+	vp2.put(static_cast<uint8_t>(10));
+	assert(range(std::array{10, 2, 3, 4}) == v);
 }
 
 struct less {
@@ -428,7 +428,7 @@ void orderedTests () {
 	assert(v.begin() == s.begin());
 
 	const auto z = ordered<less>(v);
-// 	assert(z == s);
+	assert(z == s);
 	assert(z.contains(1));
 	assert(z.contains(5));
 	assert(not z.contains(0));
@@ -445,10 +445,8 @@ void putTests () {
 	save.put(9u);
 	save.put(7u);
 	save.put(5u);
-	assert(v[0] == 11);
-	assert(v[1] == 9);
-	assert(v[2] == 7);
-	assert(v[3] == 5);
+	assert(range(std::array{11, 9, 7, 5}) == v);
+	assert(range(std::array{11, 9}) == range(v).take(2));
 }
 
 void iterTests () {
@@ -495,6 +493,15 @@ void iterTests () {
 	// d.front(); // assert or U/B
 }
 
+void nullTests () {
+	auto a = range<int*>(nullptr, nullptr);
+	assert(a.empty());
+	assert(a.size() == 0);
+	assert(a.take(1).empty());
+	assert(a.take(1).size() == 0);
+	// a.front(); // assert or U/B
+}
+
 int main () {
 	rangeTests();
 	rangeTests2();
@@ -510,6 +517,7 @@ int main () {
 	overloadTests();
 	orderedTests();
 	signedDistanceTests();
+	nullTests();
 
 	return 0;
 }
