@@ -324,7 +324,7 @@ void otherUsageTests () {
 	}
 	printf("\n");
 
-	// fails, map has no random access iterationc
+	// fails, map has no random access iteration
 // 	assert(rm[0].second == 3);
 // 	assert(rm[1].second == 44);
 // 	assert(rm[2].second == 555);
@@ -427,24 +427,36 @@ void orderedTests () {
 	s = ordered(v);
 	assert(v.begin() == s.begin());
 
-	const auto z = ordered<less>(v);
-	assert(z == s);
-	assert(z.contains(1));
-	assert(z.contains(5));
-	assert(not z.contains(0));
-	assert(not z.contains(6));
-	assert(z.lower_bound(6) == z.end());
-	assert(*z.lower_bound(5) == z.back());
+	const auto l = ordered<std::less<>>(v);
+	assert(l == s);
+	assert(l.contains(1));
+	assert(l.contains(5));
+	assert(not l.contains(0));
+	assert(not l.contains(6));
+	assert(l.lower_bound(6) == l.end());
+	assert(*l.lower_bound(5) == l.back());
+
+	std::sort(v.begin(), v.end(), std::greater<>());
+	// l behaviour is undefined now
+
+	const auto g = ordered<std::greater<>>(v);
+	assert(g.contains(1));
+	assert(g.contains(5));
+	assert(not g.contains(0));
+	assert(not g.contains(6));
+	assert(g.lower_bound(6) == g.begin());
+	assert(*g.lower_bound(5) == g.front());
 }
 
 void putTests () {
 	auto v = std::vector<uint32_t>{1, 2, 3, 4};
 	auto save = range(v);
-
 	save.put(11u);
 	save.put(9u);
 	save.put(7u);
 	save.put(5u);
+	assert(save.empty());
+
 	assert(range(std::array{11, 9, 7, 5}) == v);
 	assert(range(std::array{11, 9}) == range(v).take(2));
 }
