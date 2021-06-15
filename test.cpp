@@ -363,8 +363,8 @@ void otherUsageTests () {
 	assert(range(f).drop(1).front() == 2);
 	assert(range(f).drop(2).front() == 1);
 	assert(range(f).drop(3).empty());
-// 	assert(range(f).back()); // should fail instantiation
-// 	assert(range(f).size() == 3); // no matching call
+	// assert(range(f).back()); // error: no matching member function
+	// assert(range(f).size() == 3); // error: no matching member function
 }
 
 void overloadTests () {
@@ -375,7 +375,7 @@ void overloadTests () {
 	assert(vp.begin() == vp.data());
 	assert(vp.data() == v.data());
 
-	// range(v).data(); // error: no matching function
+	// range(v).data(); // error: no matching member function
 	memmove(vp.data(), vp.data(), vp.size()); // OK
 
 	auto vpu = range(v.data(), v.data() + v.size());

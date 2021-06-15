@@ -51,7 +51,7 @@ namespace __ranger {
 		}
 	}
 
-	template <typename R, bool Condition = R::is_forward::value>
+	template <typename R, bool Condition = R::is_bidirectional::value>
 	typename std::conditional_t<Condition, R, void>
 	pop_back (R& r, const size_t un) {
 		const auto n = static_cast<typename R::distance_type>(un);
@@ -110,6 +110,7 @@ namespace __ranger {
 		>;
 		using distance_type = decltype(std::distance(I(), I()));
 		using iterator_category = typename std::iterator_traits<I>::iterator_category;
+		using is_bidirectional = std::is_base_of<std::bidirectional_iterator_tag, iterator_category>;
 		using is_forward = std::is_base_of<std::forward_iterator_tag, iterator_category>;
 		using is_input = std::is_base_of<std::input_iterator_tag, iterator_category>;
 		using is_random_access = std::is_base_of<std::random_access_iterator_tag, iterator_category>;
@@ -132,7 +133,7 @@ namespace __ranger {
 			return copy;
 		}
 
-		template <bool Condition = is_forward::value>
+		template <bool Condition = is_bidirectional::value>
 		typename std::enable_if_t<Condition, Range>
 		drop_back (const size_t un) const {
 			auto copy = *this;
