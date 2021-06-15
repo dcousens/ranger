@@ -1,10 +1,13 @@
 #include <array>
 #include <cassert>
 #include <cstring>
-#include <iostream>
-#include <list>
 #include <forward_list>
+#include <fstream>
+#include <iostream>
+#include <iterator>
+#include <list>
 #include <map>
+#include <sstream>
 #include <type_traits>
 #include <vector>
 
@@ -14,16 +17,17 @@
 using namespace ranger;
 
 template <bool text = false, typename R>
-void printr (const R r) {
-	for (auto s = r; not s.empty(); s.pop_front()) {
-		printf(text ? "%c" : "%i ", s.front());
+void printr (R r) {
+	while (not r.empty()) {
+		printf(text ? "%c" : "%i ", r.front());
+		r.pop_front();
 	}
 	printf("\n");
 }
 
 void rangeTests () {
-	auto a = std::array<uint8_t, 32>{};
-	for (size_t i = 0; i < a.size(); ++i) a[i] = static_cast<uint8_t>((i * 2) + 1);
+	auto a = std::array<int, 32>{};
+	for (size_t i = 0; i < a.size(); ++i) a[i] = static_cast<int>((i * 2) + 1);
 
 	auto b = range(a).drop(10);
 	assert(a.size() == 32);
@@ -58,7 +62,7 @@ void rangeTests () {
 
 	auto e = d.drop(100); // oh no! past the end
 	assert(e.empty()); // thats OK
-// 	e.front(); // undefined behaviour!
+	// e.front(); // assert or U/B
 }
 
 void rangeTests2 () {
@@ -161,6 +165,7 @@ void popTests () {
 	auto numbers = std::vector<int>{1, 2, 3, 4, 5, 6};
 
 	auto a = range(numbers);
+	static_assert(decltype(a)::is_forward::value);
 	auto af = a.pop_front(3);
 
 	assert(af == range(numbers).take(3));
@@ -239,6 +244,7 @@ struct Foo {
 		return a == x.a and b == x.b and c == x.c and d == x.d;
 	}
 };
+#pragma pack()
 
 void serialTests () {
 	const auto aaaa = Foo{ 165, 102, 42, 10 };
@@ -445,20 +451,13 @@ void putTests () {
 	assert(v[3] == 5);
 }
 
-#include <iostream>
-#include <iterator>
-#include <sstream>
-
 void iterTests () {
 	auto stream = std::stringstream{"5 7 9"};
-	auto start = std::istream_iterator<int>{stream};
+	auto begin = std::istream_iterator<int>{stream};
 	auto end = std::istream_iterator<int>{};
 
-	auto a = range(start, end);
+	auto a = range(begin, end);
 
-// 	const auto d = { 5, 7, 9 };
-// 	assert(a == range(d)); // cannot, requires forward_iterator
-// 	printf("%zu\n", a.size()); // destructive!
 	assert(stream.good());
 	assert(a.front() == 5);
 	a.pop_front();
@@ -469,27 +468,31 @@ void iterTests () {
 	assert(a.front() == 9);
 	a.pop_front();
 	assert(a.empty());
-// 	a.pop_front(); // undefined behavior
+	// a.front(); // assert or U/B
 
-	auto b = range(start, end);
-	assert(b.front() == 5); // cached by 'start' iterator...
+	auto b = range(begin, end);
+	assert(b.front() == 5); // cached by 'begin' iterator...
 	b.pop_front();
 	assert(b.empty()); // stringstream is depleted
 
-	auto streamb = std::stringstream{"5 7 9"};
-	auto c = range(std::istream_iterator<int>{streamb}, std::istream_iterator<int>{});
-	assert(streamb.good());
+	auto streamc = std::stringstream{"5 7 9"};
+	auto c = range(std::istream_iterator<int>{streamc}, std::istream_iterator<int>{});
+	assert(streamc.good());
 
-	auto d = c.drop(1); // drops the front
-	assert(d.front() == 7);
-	assert(d.front() == 7); // cached by 'start' iterator...
+	c.pop_front(21);
+	assert(c.empty());
+	assert(streamc.eof());
 
-	auto e = c.drop(20);
-	assert(e.empty());
+	auto streamd = std::stringstream{"8 9 10"};
+	auto d = input_range(std::istream_iterator<int>{streamd});
+	assert(streamd.good());
+	assert(not streamd.eof());
+	d.pop_front(4);
 
-	d.pop_front();
-	assert(d.empty()); // depleted by e
-	assert(streamb.eof());
+	assert(d.empty());
+	assert(not streamd.good());
+	assert(streamd.eof());
+	// d.front(); // assert or U/B
 }
 
 int main () {

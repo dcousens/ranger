@@ -7,13 +7,74 @@
 
 namespace __ranger {
 	template <typename R, typename F>
-	auto drop_until (R r, const F f) {
-		while (not r.empty()) {
-			if (f(r.front())) break;
-			r.pop_front();
+	auto pop_until (R& r, const F f) {
+		if constexpr(not R::is_forward::value) {
+			while (not r.empty()) {
+				if (f(r.front())) break;
+				r.pop_front();
+			}
+		} else {
+			auto copy = r;
+
+			while (not r.empty()) {
+				if (f(r.front())) break;
+				r.pop_front();
+			}
+
+			return R(copy.begin(), r.begin());
+		}
+	}
+
+	template <typename R, bool Condition = R::is_forward::value>
+	typename std::conditional_t<Condition, R, void>
+	pop_front (R& r, const size_t un) {
+		const auto n = static_cast<typename R::distance_type>(un);
+		if constexpr(std::is_signed<typename R::distance_type>::value) {
+			assert(n >= 0);
 		}
 
-		return r;
+		if constexpr(not R::is_forward::value) {
+			if (r.empty()) return;
+			std::advance(r._begin, n);
+			return;
+		} else {
+			if (r.empty()) return r;
+			auto it = r._begin;
+			std::advance(r._begin, n);
+			if constexpr(R::is_random_access::value) {
+				if (r._begin > r._end) {
+					r._begin = r._end;
+				}
+			}
+
+			return R(it, r._begin);
+		}
+	}
+
+	template <typename R, bool Condition = R::is_forward::value>
+	typename std::conditional_t<Condition, R, void>
+	pop_back (R& r, const size_t un) {
+		const auto n = static_cast<typename R::distance_type>(un);
+		if constexpr(std::is_signed<typename R::distance_type>::value) {
+			assert(n >= 0);
+		}
+
+		if constexpr(not R::is_forward::value) {
+			if (r.empty()) return;
+			std::advance(r._end, -n);
+			return;
+		} else {
+			if (r.empty()) return r;
+			auto it = r._end;
+			std::advance(r._end, -n);
+			if constexpr(R::is_random_access::value) {
+				if (r._end < r._begin) {
+					r._end = r._begin;
+				}
+			}
+
+			return R(r._end, it);
+		}
 	}
 
 	template <typename R>
@@ -40,172 +101,141 @@ namespace __ranger {
 
 	template <typename I>
 	struct Range {
-	private:
 		I _begin;
 		I _end;
 
-	public:
 		using iterator = I;
 		using value_type = typename std::remove_const_t<
 			typename std::remove_reference_t<decltype(*I())>
 		>;
 		using distance_type = decltype(std::distance(I(), I()));
-		using random_access = std::is_same<std::random_access_iterator_tag, typename std::iterator_traits<I>::iterator_category>;
+		using iterator_category = typename std::iterator_traits<I>::iterator_category;
+		using is_forward = std::is_base_of<std::forward_iterator_tag, iterator_category>;
+		using is_input = std::is_base_of<std::input_iterator_tag, iterator_category>;
+		using is_random_access = std::is_base_of<std::random_access_iterator_tag, iterator_category>;
 
 		Range (I begin, I end) : _begin(begin), _end(end) {
-			if constexpr(random_access::value) {
+			if constexpr(is_random_access::value) {
 				assert(end >= begin);
 			}
 		}
 
 		auto begin () const { return this->_begin; }
-		auto empty () const { return this->_begin == this->_end; }
 		auto end () const { return this->_end; }
+		auto empty () const { return this->begin() == this->end(); }
 
-		auto drop (const size_t un) const {
-			const auto n = static_cast<distance_type>(un);
-			if constexpr(std::is_signed<distance_type>::value) {
-				assert(n >= 0);
-			}
-
-			auto it = this->_begin;
-			std::advance(it, n);
-			if constexpr(random_access::value) {
-				if (it > this->_end) return Range(this->_end, this->_end);
-			}
-
-			return Range(it, this->_end);
+		template <bool Condition = is_forward::value>
+		typename std::enable_if_t<Condition, Range>
+		drop (const size_t un) const {
+			auto copy = *this;
+			copy.pop_front(un);
+			return copy;
 		}
 
-		auto drop_back (const size_t un) const {
-			const auto n = static_cast<distance_type>(un);
-			if constexpr(std::is_signed<distance_type>::value) {
-				assert(n >= 0);
-			}
-
-			auto it = this->_end;
-			std::advance(it, -n);
-			if constexpr(random_access::value) {
-				if (it < this->_begin) return Range(this->_begin, this->_begin);
-			}
-
-			return Range(this->_begin, it);
+		template <bool Condition = is_forward::value>
+		typename std::enable_if_t<Condition, Range>
+		drop_back (const size_t un) const {
+			auto copy = *this;
+			copy.pop_back(un);
+			return copy;
 		}
 
-		template <typename F>
-		auto drop_until (const F f) const {
-			return __ranger::drop_until(*this, f);
+		template <typename F, bool Condition = is_forward::value>
+		typename std::enable_if_t<Condition, Range>
+		drop_until (const F f) const {
+			auto copy = *this;
+			copy.pop_until(f);
+			return copy;
 		}
 
 		auto take (const size_t n) const {
-			return Range(this->_begin, this->drop(n).begin());
+			return Range(this->begin(), this->drop(n).begin());
 		}
 
 		auto take_back (const size_t un) const {
-			const auto copy = this->drop_back(un);
-			return Range(copy._end, this->_end);
+			return Range(this->drop_back(un).end(), this->end());
 		}
 
 		template <typename F>
 		auto take_until (const F f) const {
-			auto save = this->drop_until(f);
-			return Range(this->_begin, save.begin());
-		}
-
-		auto& back () {
-			assert(not this->empty());
-			return *(this->_end - 1);
-		}
-
-		auto& back () const {
-			assert(not this->empty());
-			return *(this->_end - 1);
+			return Range(this->begin(), this->drop_until(f).begin());
 		}
 
 		auto& front () {
 			assert(not this->empty());
-			return *this->_begin;
+			return *this->begin();
 		}
 
 		auto& front () const {
 			assert(not this->empty());
-			return *this->_begin;
+			return *this->begin();
 		}
 
-		template <typename U=I>
-		typename std::enable_if_t<std::is_pointer_v<U>, I> data () {
-			return this->_begin;
+		auto& back () {
+			return this->take_back(1).front();
 		}
 
-		template <typename T=typename std::iterator_traits<I>::iterator_category>
-		typename std::enable_if_t<
-			std::is_same_v<std::random_access_iterator_tag, T>,
-			size_t
-		> size () const {
-			assert(this->_end >= this->_begin);
-			return static_cast<size_t>(std::distance(this->_begin, this->_end));
+		auto& back () const {
+			return this->take_back(1).front();
 		}
 
-		template <typename T=typename std::iterator_traits<I>::iterator_category>
-		typename std::enable_if_t<
-			std::is_same_v<std::random_access_iterator_tag, T>,
-			value_type&
-		> operator[] (const size_t i) {
+		template <bool Condition = std::is_pointer_v<I>>
+		typename std::enable_if_t<Condition, I>
+		data () {
+			return this->begin();
+		}
+
+		template <bool Condition = is_random_access::value>
+		typename std::enable_if_t<Condition, size_t>
+		size () const {
+			assert(this->end() >= this->begin());
+			return static_cast<size_t>(std::distance(this->begin(), this->end()));
+		}
+
+		template <bool Condition = is_random_access::value>
+		typename std::enable_if_t<Condition, value_type&>
+		operator[] (const size_t i) {
 			return this->drop(i).front();
 		}
 
-		template <typename T=typename std::iterator_traits<I>::iterator_category>
-		typename std::enable_if_t<
-			std::is_same_v<std::random_access_iterator_tag, T>,
-			value_type
-		> operator[] (const size_t i) const {
+		template <bool Condition = is_random_access::value>
+		typename std::enable_if_t<Condition, value_type>
+		operator[] (const size_t i) const {
 			return this->drop(i).front();
 		}
 
-		template <typename E, typename T=typename std::iterator_traits<I>::iterator_category>
-		typename std::enable_if_t<
-			std::is_base_of_v<std::forward_iterator_tag, T>,
-			bool
-		> operator< (const E& rhs) const {
+		template <typename E, bool Condition = is_forward::value>
+		typename std::enable_if_t<Condition, bool>
+		operator< (const E& rhs) const {
 			return std::lexicographical_compare(this->begin(), this->end(), rhs.begin(), rhs.end());
 		}
 
-		template <typename E, typename T=typename std::iterator_traits<I>::iterator_category>
-		typename std::enable_if_t<
-			std::is_base_of_v<std::forward_iterator_tag, T>,
-			bool
-		> operator== (const E& rhs) const {
+		template <typename E, bool Condition = is_forward::value>
+		typename std::enable_if_t<Condition, bool>
+		operator== (const E& rhs) const {
 			return std::equal(this->begin(), this->end(), rhs.begin(), rhs.end());
 		}
 
 		// mutators
-		void pop_back () {
-			if (this->empty()) return;
-			std::advance(this->_end, -1);
+		auto pop_back () {
+			return __ranger::pop_back(*this, 1);
 		}
 
-		auto pop_back (const size_t n) {
-			auto save = this->_end;
-			*this = this->drop_back(n);
-			return Range(this->_end, save);
+		auto pop_back (const size_t un) {
+			return __ranger::pop_back(*this, un);
 		}
 
-		void pop_front () {
-			if (this->empty()) return;
-			std::advance(this->_begin, 1);
+		auto pop_front () {
+			return __ranger::pop_front(*this, 1);
 		}
 
-		auto pop_front (const size_t n) {
-			auto save = this->_begin;
-			*this = this->drop(n);
-			return Range(save, this->_begin);
+		auto pop_front (const size_t un) {
+			return __ranger::pop_front(*this, un);
 		}
 
 		template <typename F>
 		auto pop_until (const F f) {
-			auto save = this->_begin;
-			*this = this->drop_until(f);
-			return Range(save, this->_begin);
+			return __ranger::pop_until(*this, f);
 		}
 
 		template <typename E>
@@ -214,7 +244,6 @@ namespace __ranger {
 
 	template <typename I, typename F>
 	struct OrderedRange : public Range<I> {
-	public:
 		OrderedRange (I begin, I end) : Range<I>(begin, end) {}
 
 		using value_type = typename Range<I>::value_type;
@@ -275,6 +304,15 @@ namespace ranger {
 	template <typename R>
 	auto ordered (R& r) {
 		return ordered<std::less<>, R>(r);
+	}
+
+	template <typename I>
+	typename std::enable_if_t<
+		range_t<I>::is_input::value,
+		range_t<I>
+	>
+	input_range (I begin) {
+		return range_t<I>(begin, I{});
 	}
 
 	// rvalue references wrappers
