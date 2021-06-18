@@ -187,7 +187,16 @@ void popTests () {
 	auto df = d.pop_until([](auto x) { return x == 9; }); // doesn't exist
 
 	assert(df == range(numbers));
+	assert( d.empty());
 	assert( d == range(numbers).drop(6));
+	assert( d.drop(1000000).empty());
+
+	d.pop_front(0xffffffff);
+	d.pop_front(0x7ffffffffffffffe);
+	d.pop_front(0x7fffffffffffffff);
+// 	d.pop_front(0x8000000000000000); // assert or U/B, exceeds ssize_t
+	assert( d.empty());
+	assert( d == range(numbers).drop(6)); // unchanged
 }
 
 void reverseTests () {
