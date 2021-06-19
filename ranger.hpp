@@ -217,6 +217,35 @@ namespace __ranger {
 			return std::equal(this->begin(), this->end(), rhs.begin(), rhs.end());
 		}
 
+		template <typename F>
+		bool any (const F f) const {
+			for (auto x : *this) {
+				if (f(x)) return true;
+			}
+
+			return false;
+		}
+
+		template <typename F>
+		bool all (const F f) const {
+			for (auto x : *this) {
+				if (not f(x)) return false;
+			}
+
+			return true;
+		}
+
+		template <typename F>
+		size_t count (const F f) const {
+			size_t result = 0;
+
+			for (auto x : *this) {
+				if (f(x)) ++result;
+			}
+
+			return result;
+		}
+
 		// mutators
 		auto pop_back () {
 			return __ranger::pop_back(*this, 1);

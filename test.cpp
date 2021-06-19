@@ -523,6 +523,25 @@ void nullTests () {
 	// a.front(); // assert or U/B
 }
 
+void algoTests () {
+	auto v = std::vector<uint8_t>{1, 2, 3, 4};
+	auto va = range(v);
+
+	assert(va.count([](auto x) { return x == 3; }) == 1);
+	assert(va.count([](auto x) { return x > 0 or x < 4; }) == 4);
+	assert(va.count([](auto x) { return x == 6; }) == 0);
+
+	assert(va.any([](auto x) { return x == 3; }));
+	assert(not va.any([](auto x) { return x == 6; }));
+
+	assert(va.all([](auto x) { return x > 0 or x < 4; }));
+	assert(not va.all([](auto x) { return x == 3; }));
+
+	auto nothing = range<int*>(nullptr, nullptr);
+	assert(nothing.all([](auto) { return false; }));
+	assert(not nothing.any([](auto) { return true; }));
+}
+
 int main () {
 	rangeTests();
 	rangeTests2();
@@ -539,6 +558,7 @@ int main () {
 	orderedTests();
 	signedDistanceTests();
 	nullTests();
+	algoTests();
 
 	return 0;
 }
