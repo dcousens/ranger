@@ -6,25 +6,6 @@
 #include <type_traits>
 
 namespace __ranger {
-	template <typename R, typename F>
-	auto pop_until (R& r, const F f) {
-		if constexpr(not R::is_forward::value) {
-			while (not r.empty()) {
-				if (f(r.front())) break;
-				r.pop_front();
-			}
-		} else {
-			auto copy = r;
-
-			while (not r.empty()) {
-				if (f(r.front())) break;
-				r.pop_front();
-			}
-
-			return R(copy.begin(), r.begin());
-		}
-	}
-
 	template <typename R, bool Condition = R::is_forward::value>
 	typename std::conditional_t<Condition, R, void>
 	pop_front (R& r, const size_t un) {
@@ -74,6 +55,44 @@ namespace __ranger {
 			}
 
 			return R(r._end, it);
+		}
+	}
+
+	template <typename R, typename F>
+	auto pop_until (R& r, const F f) {
+		if constexpr(not R::is_forward::value) {
+			while (not r.empty()) {
+				if (f(r.front())) break;
+				r.pop_front();
+			}
+		} else {
+			auto copy = r;
+
+			while (not r.empty()) {
+				if (f(r.front())) break;
+				r.pop_front();
+			}
+
+			return R(copy.begin(), r.begin());
+		}
+	}
+
+	template <typename R, typename F>
+	auto pop_back_until (R& r, const F f) {
+		if constexpr(not R::is_forward::value) {
+			while (not r.empty()) {
+				if (f(r.back())) break;
+				r.pop_back();
+			}
+		} else {
+			auto copy = r;
+
+			while (not r.empty()) {
+				if (f(r.back())) break;
+				r.pop_back();
+			}
+
+			return R(r.end(), copy.end());
 		}
 	}
 
@@ -266,6 +285,11 @@ namespace __ranger {
 		template <typename F>
 		auto pop_until (const F f) {
 			return __ranger::pop_until(*this, f);
+		}
+
+		template <typename F>
+		auto pop_back_until (const F f) {
+			return __ranger::pop_back_until(*this, f);
 		}
 
 		template <typename E>

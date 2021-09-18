@@ -197,6 +197,20 @@ void popTests () {
 // 	d.pop_front(0x8000000000000000); // assert or U/B, exceeds ssize_t
 	assert( d.empty());
 	assert( d == range(numbers).drop(6)); // unchanged
+
+	auto e = range(numbers);
+	auto ef = e.pop_back_until([](auto x) { return x == 4; });
+
+	printr<false>(range(e));
+	printr<false>(range(ef));
+
+	assert(e  == range(numbers).take(4));
+	assert(ef == range(numbers).drop(4));
+
+	auto f = range(numbers);
+	auto ff = f.pop_back_until([](auto x) { return x == 9; }); // doesn't exist
+	assert(f  == range(numbers).take(0));
+	assert(ff == range(numbers).drop(0));
 }
 
 void reverseTests () {
