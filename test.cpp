@@ -156,9 +156,23 @@ void untilTests () {
 	assert(du4[0] == 4);
 	assert(du4.size() == 3);
 
+	auto dbu3 = range(numbers).drop_back_until([](auto x) { return x == 3; });
+	assert(dbu3 == range(numbers).take(3));
+
+	auto dbu4 = range(numbers).drop_back_until([](auto x) { return x == 4; });
+	assert(dbu4 == range(numbers).take(4));
+
 	auto tu4 = range(numbers).take_until([](auto x) { return x == 5; });
 	assert(tu4[0] == 1);
 	assert(tu4.size() == 4);
+
+	auto tbu3 = range(numbers).take_back_until([](auto x) { return x == 3; });
+	printr(tbu3);
+	assert(tbu3 == range(numbers).drop(3));
+
+	auto tbu4 = range(numbers).take_back_until([](auto x) { return x == 4; });
+	printr(tbu4);
+	assert(tbu4 == range(numbers).drop(4));
 }
 
 void popTests () {
@@ -200,10 +214,6 @@ void popTests () {
 
 	auto e = range(numbers);
 	auto ef = e.pop_back_until([](auto x) { return x == 4; });
-
-	printr<false>(range(e));
-	printr<false>(range(ef));
-
 	assert(e  == range(numbers).take(4));
 	assert(ef == range(numbers).drop(4));
 

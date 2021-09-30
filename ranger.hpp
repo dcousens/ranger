@@ -152,6 +152,14 @@ namespace __ranger {
 			return copy;
 		}
 
+		template <typename F, bool Condition = is_forward::value>
+		typename std::enable_if_t<Condition, Range>
+		drop_until (const F f) const {
+			auto copy = *this;
+			copy.pop_until(f);
+			return copy;
+		}
+
 		template <bool Condition = is_bidirectional::value>
 		typename std::enable_if_t<Condition, Range>
 		drop_back (const size_t un) const {
@@ -162,9 +170,9 @@ namespace __ranger {
 
 		template <typename F, bool Condition = is_forward::value>
 		typename std::enable_if_t<Condition, Range>
-		drop_until (const F f) const {
+		drop_back_until (const F f) const {
 			auto copy = *this;
-			copy.pop_until(f);
+			copy.pop_back_until(f);
 			return copy;
 		}
 
@@ -172,13 +180,18 @@ namespace __ranger {
 			return Range(this->begin(), this->drop(n).begin());
 		}
 
+		template <typename F>
+		auto take_until (const F f) const {
+			return Range(this->begin(), this->drop_until(f).begin());
+		}
+
 		auto take_back (const size_t un) const {
 			return Range(this->drop_back(un).end(), this->end());
 		}
 
 		template <typename F>
-		auto take_until (const F f) const {
-			return Range(this->begin(), this->drop_until(f).begin());
+		auto take_back_until (const F f) const {
+			return Range(this->drop_back_until(f).end(), this->end());
 		}
 
 		auto& front () {
