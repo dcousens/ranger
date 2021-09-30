@@ -167,12 +167,17 @@ void untilTests () {
 	assert(tu4.size() == 4);
 
 	auto tbu3 = range(numbers).take_back_until([](auto x) { return x == 3; });
-	printr(tbu3);
 	assert(tbu3 == range(numbers).drop(3));
 
 	auto tbu4 = range(numbers).take_back_until([](auto x) { return x == 4; });
-	printr(tbu4);
 	assert(tbu4 == range(numbers).drop(4));
+
+	auto tt45 = range(numbers)
+		.take_back_until([](auto x) { return x == 2; })
+		.take_until([](auto x) { return x == 6; })
+		.drop_until([](auto x) { return x == 4; });
+
+	assert(tt45 == range(numbers).drop(3).take(2));
 }
 
 void popTests () {
