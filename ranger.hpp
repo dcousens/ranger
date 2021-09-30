@@ -144,6 +144,12 @@ namespace __ranger {
 		auto end () const { return this->_end; }
 		auto empty () const { return this->begin() == this->end(); }
 
+		template <bool Condition = std::is_pointer_v<I>>
+		typename std::enable_if_t<Condition, I>
+		data () const {
+			return this->begin();
+		}
+
 		template <bool Condition = is_forward::value>
 		typename std::enable_if_t<Condition, Range>
 		drop (const size_t un) const {
@@ -210,12 +216,6 @@ namespace __ranger {
 
 		auto& back () const {
 			return this->take_back(1).front();
-		}
-
-		template <bool Condition = std::is_pointer_v<I>>
-		typename std::enable_if_t<Condition, I>
-		data () {
-			return this->begin();
 		}
 
 		template <bool Condition = is_random_access::value>
