@@ -289,10 +289,10 @@ void serialTests () {
 	auto a = std::array<uint8_t, 4>{165, 102, 42, 10};
 
 	auto x = serial::peek<int32_t>(a);
-	assert(x == ((a[0] << 0) + (a[1] << 8) + (a[2] << 16) + (a[3] << 24)));
+	assert(x == ((a[0] << 0) | (a[1] << 8) | (a[2] << 16) | (a[3] << 24)));
 
 	auto y = serial::peek<int32_t, true>(a);
-	assert(y == ((a[0] << 24) + (a[1] << 16) + (a[2] << 8) + (a[3] << 0)));
+	assert(y == ((a[0] << 24) | (a[1] << 16) | (a[2] << 8) | (a[3] << 0)));
 
 	auto z = serial::peek<Foo>(a);
 	assert(z == aaaa);
