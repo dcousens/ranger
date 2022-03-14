@@ -14,11 +14,17 @@ namespace compat {
 	}
 
 	template <typename R, typename E>
+	auto peek_from_chars (R& r, E value) {
+		std::from_chars(r.data(), r.data() + r.size(), value);
+		return value;
+	}
+
+	template <typename R, typename E>
 	auto read_from_chars (R& r, E value) {
 		auto result = std::from_chars(r.data(), r.data() + r.size(), value);
 		if (result.ec != std::errc()) return value;
 
-		// TODO: refactor
+		// TODO: revise
 		while (not r.empty()) {
 			if (r.data() == result.ptr) break;
 			r.pop_front();

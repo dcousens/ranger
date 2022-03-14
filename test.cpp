@@ -586,8 +586,10 @@ void compatTests () {
 	auto vb = ptr_range(v);
 	assert(compat::read_from_chars(vb, 0UL) == 10UL);
 	vb.pop_front();
+	assert(compat::peek_from_chars(vb, 0) == 432);
 	assert(compat::read_from_chars(vb, 0) == 432);
 	vb.pop_front();
+	assert(compat::peek_from_chars(vb, 0) == -55);
 	assert(compat::read_from_chars(vb, 0) == -55);
 }
 
