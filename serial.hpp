@@ -15,7 +15,7 @@
 
 namespace serial {
 	template <typename E, bool BE = false, typename R>
-	auto peek (const R& r) {
+	auto peek (R const& r) {
 		using T = typename R::value_type;
 
 		static_assert(std::is_same<T, uint8_t>::value, "Expected uint8_t elements");
@@ -41,7 +41,7 @@ namespace serial {
 	}
 
 	template <typename E, bool BE = false, typename R>
-	void place (R& r, const E value) {
+	void place (R& r, E const value) {
 		using T = typename R::value_type;
 
 		static_assert(std::is_same<T, uint8_t>::value, "Expected uint8_t elements");
@@ -66,13 +66,13 @@ namespace serial {
 	auto read (R& r) {
 		using T = typename R::value_type;
 
-		const auto e = peek<E, BE, R>(r);
+		auto const e = peek<E, BE, R>(r);
 		r = r.drop(sizeof(E) / sizeof(T));
 		return e;
 	}
 
 	template <typename E, bool BE = false, typename R>
-	void put (R& r, const E e) {
+	void put (R& r, E const e) {
 		using T = typename R::value_type;
 
 		place<E, BE, R>(r, e);

@@ -13,6 +13,7 @@
 
 #include "ranger.hpp"
 #include "serial.hpp"
+#include "compat.hpp"
 
 using namespace ranger;
 
@@ -571,6 +572,25 @@ void algoTests () {
 	assert(not nothing.any([](auto) { return true; }));
 }
 
+void compatTests () {
+	auto v = std::vector<char>(10);
+	auto va = ptr_range(v);
+
+	assert(compat::put_to_chars(va, 10UL));
+	va.put(' ');
+	assert(compat::put_to_chars(va, 432));
+	va.put(' ');
+	assert(compat::put_to_chars(va, -55));
+	assert(range(v) == zstr_range("10 432 -55"));
+
+	auto vb = ptr_range(v);
+	assert(compat::read_from_chars(vb, 0UL) == 10UL);
+	vb.pop_front();
+	assert(compat::read_from_chars(vb, 0) == 432);
+	vb.pop_front();
+	assert(compat::read_from_chars(vb, 0) == -55);
+}
+
 int main () {
 	rangeTests();
 	rangeTests2();
@@ -588,6 +608,7 @@ int main () {
 	signedDistanceTests();
 	nullTests();
 	algoTests();
+	compatTests();
 
 	return 0;
 }
