@@ -14,7 +14,7 @@ namespace compat {
 	}
 
 	template <typename R, typename E>
-	auto peek_from_chars (R& r, E value) {
+	auto peek_from_chars (R const& r, E value) {
 		std::from_chars(r.data(), r.data() + r.size(), value);
 		return value;
 	}
