@@ -672,6 +672,43 @@ void algoRangeTests () {
 	assert(  foobar.ends_with(zstr_range("foobar")));
 }
 
+void untoTests () {
+	auto data = zstr_range("the quick brown fox jumped");
+	auto save = data;
+
+	save.pop_until([](auto c) { return c == 'b'; });
+	data = data.drop_unto(save);
+	assert(data == zstr_range("brown fox jumped"));
+
+	save.pop_back_until([](auto c) { return c == 'x'; });
+	data = data.drop_back_unto(save);
+	assert(data == zstr_range("brown fox"));
+
+	auto const a = data.drop_unto(zstr_range("out of bounds"));
+	assert(a.empty() or a == data); // truncated or unchanged, but not U/B
+
+	auto const b = data.drop_back_unto(zstr_range("out of bounds (2)"));
+	assert(b.empty() or b == data); // truncated or unchanged, but not U/B
+
+	auto const fox = data.drop(6);
+	auto const c = data.drop_unto(fox);
+	assert(c == zstr_range("fox"));
+
+	auto const d = data.drop_back_unto(fox);
+	assert(d == zstr_range("brown fox"));
+
+	auto const brown = data.drop_back_until([](auto c) { return c == 'n'; });
+	assert(brown == zstr_range("brown"));
+
+	assert(brown.drop_unto(fox).empty()); // truncated
+	assert(brown.drop_back_unto(fox) == brown); // unchanged
+
+	assert(fox.drop_unto(brown) == fox); // unchanged
+	assert(fox.drop_back_unto(brown).empty()); // truncated
+
+	printr<true>(data);
+}
+
 int main () {
 	rangeTests();
 	rangeTests2();
@@ -691,6 +728,7 @@ int main () {
 	algoTests();
 	algoRangeTests();
 	compatTests();
+	untoTests();
 
 	return 0;
 }

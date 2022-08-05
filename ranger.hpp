@@ -255,6 +255,18 @@ namespace __ranger {
 			return copy;
 		}
 
+		auto drop_unto (Range const e) const {
+			if (e.begin() < this->begin()) return *this;
+			if (e.begin() > this->end()) return Range(this->end(), this->end());
+			return Range(e.begin(), this->end());
+		}
+
+		auto drop_back_unto (Range const e) const {
+			if (e.end() > this->end()) return *this;
+			if (e.end() < this->begin()) return Range(this->begin(), this->begin());
+			return Range(this->begin(), e.end());
+		}
+
 		auto take (size_t const n) const {
 			return Range(this->begin(), this->drop(n).begin());
 		}
