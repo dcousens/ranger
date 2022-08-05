@@ -6,127 +6,116 @@
 #include <type_traits>
 
 namespace __ranger {
-	template <typename R, bool Condition = R::is_forward::value>
+	template <typename I>
+	struct Range;
+
+	template <typename I, typename R = Range<I>, bool Condition = R::is_forward::value>
 	typename std::conditional_t<Condition, R, void>
-	pop_front (R& r, size_t const un) {
+	pop_front (R& a, size_t const un) {
 		auto const n = static_cast<typename R::distance_type>(un);
 		if constexpr(std::is_signed<typename R::distance_type>::value) {
 			assert(n >= 0);
 		}
 
 		if constexpr(not R::is_forward::value) {
-			if (r.empty()) return;
-			std::advance(r._begin, n);
+			if (a.empty()) return;
+			std::advance(a._begin, n);
 			return;
 		} else {
-			if (r.empty()) return r;
-			auto it = r._begin;
-			std::advance(r._begin, n);
+			if (a.empty()) return a;
+			auto it = a._begin;
+			std::advance(a._begin, n);
 			if constexpr(R::is_random_access::value) {
-				if (r._begin > r._end) {
-					r._begin = r._end;
+				if (a._begin > a._end) {
+					a._begin = a._end;
 				}
 			}
 
-			return R(it, r._begin);
+			return R(it, a._begin);
 		}
 	}
 
-	template <typename R, bool Condition = R::is_bidirectional::value>
+	template <typename I, typename R = Range<I>, bool Condition = R::is_bidirectional::value>
 	typename std::conditional_t<Condition, R, void>
-	pop_back (R& r, size_t const un) {
+	pop_back (R& a, size_t const un) {
 		auto const n = static_cast<typename R::distance_type>(un);
 		if constexpr(std::is_signed<typename R::distance_type>::value) {
 			assert(n >= 0);
 		}
 
 		if constexpr(not R::is_forward::value) {
-			if (r.empty()) return;
-			std::advance(r._end, -n);
+			if (a.empty()) return;
+			std::advance(a._end, -n);
 			return;
 		} else {
-			if (r.empty()) return r;
-			auto it = r._end;
-			std::advance(r._end, -n);
+			if (a.empty()) return a;
+			auto it = a._end;
+			std::advance(a._end, -n);
 			if constexpr(R::is_random_access::value) {
-				if (r._end < r._begin) {
-					r._end = r._begin;
+				if (a._end < a._begin) {
+					a._end = a._begin;
 				}
 			}
 
-			return R(r._end, it);
+			return R(a._end, it);
 		}
 	}
 
-	template <typename R, typename F>
-	auto pop_until (R& r, F const f) {
+	template <typename I, typename R = Range<I>, typename F>
+	auto pop_until (R& a, F const f) {
 		if constexpr(not R::is_forward::value) {
-			while (not r.empty()) {
-				if (f(r.front())) break;
-				r.pop_front();
+			while (not a.empty()) {
+				if (f(a.front())) break;
+				a.pop_front();
 			}
 		} else {
-			auto copy = r;
+			auto copy = a;
 
-			while (not r.empty()) {
-				if (f(r.front())) break;
-				r.pop_front();
+			while (not a.empty()) {
+				if (f(a.front())) break;
+				a.pop_front();
 			}
 
-			return R(copy.begin(), r.begin());
+			return R(copy.begin(), a.begin());
 		}
 	}
 
-	template <typename R, typename F>
-	auto pop_back_until (R& r, F const f) {
+	template <typename I, typename R = Range<I>, typename F>
+	auto pop_back_until (R& a, F const f) {
 		if constexpr(not R::is_forward::value) {
-			while (not r.empty()) {
-				if (f(r.back())) break;
-				r.pop_back();
+			while (not a.empty()) {
+				if (f(a.back())) break;
+				a.pop_back();
 			}
 		} else {
-			auto copy = r;
+			auto copy = a;
 
-			while (not r.empty()) {
-				if (f(r.back())) break;
-				r.pop_back();
+			while (not a.empty()) {
+				if (f(a.back())) break;
+				a.pop_back();
 			}
 
-			return R(r.end(), copy.end());
+			return R(a.end(), copy.end());
 		}
 	}
 
-	template <typename R>
-	void put (R& r, typename R::value_type e) {
-		r.front() = e;
-		r.pop_front();
+	template <typename I>
+	void put (Range<I>& a, typename Range<I>::value_type v) {
+		a.front() = v;
+		a.pop_front();
 	}
 
-	template <
-		typename R,
-		typename E,
-		typename V = typename std::enable_if_t<
-			std::is_same_v<typename R::value_type, typename E::value_type>,
-			E
-		>
-	>
-	void put (R& r, E e) {
-		while (not e.empty()) {
-			r.front() = e.front();
-			r.pop_front();
-			e.pop_front();
+	template <typename A, typename B>
+	void put (Range<A>& a, Range<B> b) {
+		while (not b.empty()) {
+			a.front() = b.front();
+			a.pop_front();
+			b.pop_front();
 		}
 	}
 
-	template <
-		typename A,
-		typename B,
-		typename V = typename std::enable_if_t<
-			std::is_same_v<typename A::value_type, typename B::value_type>,
-			typename B::value_type
-		>
-	>
-	bool contains (A a, B b_) {
+	template <typename A, typename B>
+	bool contains (Range<A> a, Range<B> const b_) {
 		auto b = b_;
 
 		while (not (a.empty() or b.empty())) {
@@ -143,15 +132,8 @@ namespace __ranger {
 		return b.empty();
 	}
 
-	template <
-		typename A,
-		typename B,
-		typename V = typename std::enable_if_t<
-			std::is_same_v<typename A::value_type, typename B::value_type>,
-			typename B::value_type
-		>
-	>
-	bool starts_with (A a, B const b_) {
+	template <typename A, typename B>
+	bool starts_with (Range<A> a, Range<B> const b_) {
 		auto b = b_;
 
 		while (not (a.empty() or b.empty())) {
@@ -167,15 +149,8 @@ namespace __ranger {
 		return b.empty();
 	}
 
-	template <
-		typename A,
-		typename B,
-		typename V = typename std::enable_if_t<
-			std::is_same_v<typename A::value_type, typename B::value_type>,
-			typename B::value_type
-		>
-	>
-	bool ends_with (A a, B const b_) {
+	template <typename A, typename B>
+	bool ends_with (Range<A> a, Range<B> const b_) {
 		auto b = b_;
 
 		while (not (a.empty() or b.empty())) {
@@ -378,29 +353,29 @@ namespace __ranger {
 
 		// mutators
 		auto pop_back () {
-			return __ranger::pop_back(*this, 1);
+			return __ranger::pop_back<I>(*this, 1);
 		}
 
 		auto pop_back (size_t const un) {
-			return __ranger::pop_back(*this, un);
+			return __ranger::pop_back<I>(*this, un);
 		}
 
 		auto pop_front () {
-			return __ranger::pop_front(*this, 1);
+			return __ranger::pop_front<I>(*this, 1);
 		}
 
 		auto pop_front (size_t const un) {
-			return __ranger::pop_front(*this, un);
+			return __ranger::pop_front<I>(*this, un);
 		}
 
 		template <typename F>
 		auto pop_until (F const f) {
-			return __ranger::pop_until(*this, f);
+			return __ranger::pop_until<I>(*this, f);
 		}
 
 		template <typename F>
 		auto pop_back_until (F const f) {
-			return __ranger::pop_back_until(*this, f);
+			return __ranger::pop_back_until<I>(*this, f);
 		}
 
 		template <typename E>
