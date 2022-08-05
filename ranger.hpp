@@ -230,20 +230,20 @@ namespace __ranger {
 			return copy;
 		}
 
-		auto drop_unto (Range const e) const {
-			if (e.begin() < this->begin()) return *this;
-			if (e.begin() > this->end()) return Range(this->end(), this->end());
-			return Range(e.begin(), this->end());
+		auto drop_unto (Range const b) const {
+			if (b.begin() < this->begin()) return *this;
+			if (b.begin() > this->end()) return Range(this->end(), this->end());
+			return Range(b.begin(), this->end());
 		}
 
-		auto drop_back_unto (Range const e) const {
-			if (e.end() > this->end()) return *this;
-			if (e.end() < this->begin()) return Range(this->begin(), this->begin());
-			return Range(this->begin(), e.end());
+		auto drop_back_unto (Range const b) const {
+			if (b.end() > this->end()) return *this;
+			if (b.end() < this->begin()) return Range(this->begin(), this->begin());
+			return Range(this->begin(), b.end());
 		}
 
-		auto take (size_t const n) const {
-			return Range(this->begin(), this->drop(n).begin());
+		auto take (size_t const un) const {
+			return Range(this->begin(), this->drop(un).begin());
 		}
 
 		template <typename F>
@@ -297,14 +297,14 @@ namespace __ranger {
 			return this->drop(i).front();
 		}
 
-		template <typename E>
-		bool operator< (E const& rhs) const {
-			return std::lexicographical_compare(this->begin(), this->end(), rhs.begin(), rhs.end());
+		template <typename B>
+		bool operator< (B const& b) const {
+			return std::lexicographical_compare(this->begin(), this->end(), b.begin(), b.end());
 		}
 
-		template <typename E>
-		bool operator== (E const& rhs) const {
-			return std::equal(this->begin(), this->end(), rhs.begin(), rhs.end());
+		template <typename B>
+		bool operator== (B const& b) const {
+			return std::equal(this->begin(), this->end(), b.begin(), b.end());
 		}
 
 		template <typename F>
@@ -325,19 +325,19 @@ namespace __ranger {
 			return true;
 		}
 
-		template <typename E>
-		bool contains (E const& e) const {
-			return __ranger::contains(*this, e);
+		template <typename B>
+		bool contains (B const& b) const {
+			return __ranger::contains(*this, b);
 		}
 
-		template <typename E>
-		bool starts_with (E const& e) const {
-			return __ranger::starts_with(*this, e);
+		template <typename B>
+		bool starts_with (B const& b) const {
+			return __ranger::starts_with(*this, b);
 		}
 
-		template <typename E>
-		bool ends_with (E const& e) const {
-			return __ranger::ends_with(*this, e);
+		template <typename B>
+		bool ends_with (B const& b) const {
+			return __ranger::ends_with(*this, b);
 		}
 
 		template <typename F>
