@@ -1,7 +1,7 @@
 # ranger
 An attempt at a header-only range library for wrapping C++ STL iterators in a range-like interface.
 
-**WARNING:** There is no implicit bounds protection.
+**WARNING:** There is no assured bounds protection.
 
 The library does have *some* `assert`s internally for debugging purposes,  but you still need to watch out for any undefined behaviour from your iterators,  e.g dereferencing past `end`.
 
