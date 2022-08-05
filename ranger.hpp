@@ -247,7 +247,7 @@ namespace __ranger {
 			return copy;
 		}
 
-		template <typename F, bool Condition = is_forward::value>
+		template <typename F, bool Condition = is_bidirectional::value>
 		typename std::enable_if_t<Condition, Range>
 		drop_back_until (F const f) const {
 			auto copy = *this;

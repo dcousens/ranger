@@ -520,7 +520,7 @@ void iterTests () {
 	// a.front(); // assert or U/B
 
 	auto b = range(begin, end);
-	assert(b.front() == 5); // cached by 'begin' iterator...
+	assert(b.front() == 5); // cached by 'begin' iterator
 	b.pop_front();
 	assert(b.empty()); // stringstream is depleted
 
@@ -542,6 +542,27 @@ void iterTests () {
 	assert(not streamd.good());
 	assert(streamd.eof());
 	// d.front(); // assert or U/B
+
+	auto streame = std::stringstream{"5 7 9"};
+	auto e = input_range(std::istream_iterator<int>{streame});
+	assert(streame.good());
+	assert(not streame.eof());
+	assert(e == range(std::array{5, 7, 9}));
+	assert(streame.eof());
+	assert(e.front() == 5); // cached by 'begin' iterator
+	e.pop_front();
+	assert(e.empty()); // stringstream is depleted
+
+	auto streamf = std::stringstream{"5 7 9"};
+	auto f = input_range(std::istream_iterator<int>{streamf});
+	assert(not streamf.eof());
+	assert(f < range(std::array{5, 8, 0}));
+	assert(not streamf.eof());
+	assert(f.front() == 5); // cached by 'begin' iterator
+	f.pop_front();
+	assert(f.front() == 9); // what operator< reached
+	f.pop_front();
+	assert(f.empty()); // stringstream is depleted
 }
 
 void nullTests () {
