@@ -662,6 +662,14 @@ void algoRangeTests () {
 	assert(not va.ends_with(range(std::array{6, 5})));
 	assert(not va.ends_with(range(std::array{1, 2, 4})));
 	assert(not va.ends_with(range(std::array{1, 2, 3, 4, 5, 6, 7, 8})));
+
+	// zstr
+	auto const foobar = zstr_range("foobar");
+	assert(foobar.starts_with(zstr_range("foo")));
+	assert(foobar.starts_with(zstr_range("foobar")));
+	assert(    foobar.contains(zstr_range("ooba")));
+	assert(     foobar.ends_with(zstr_range("bar")));
+	assert(  foobar.ends_with(zstr_range("foobar")));
 }
 
 int main () {
