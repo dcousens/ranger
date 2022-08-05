@@ -118,6 +118,79 @@ namespace __ranger {
 		}
 	}
 
+	template <
+		typename A,
+		typename B,
+		typename V = typename std::enable_if_t<
+			std::is_same_v<typename A::value_type, typename B::value_type>,
+			typename B::value_type
+		>
+	>
+	bool contains (A a, B b_) {
+		auto b = b_;
+
+		while (not (a.empty() or b.empty())) {
+			if (a.front() == b.front()) {
+				a.pop_front();
+				b.pop_front();
+				continue;
+			}
+
+			a.pop_front();
+			b = b_; // reset
+		}
+
+		return b.empty();
+	}
+
+	template <
+		typename A,
+		typename B,
+		typename V = typename std::enable_if_t<
+			std::is_same_v<typename A::value_type, typename B::value_type>,
+			typename B::value_type
+		>
+	>
+	bool starts_with (A a, B const b_) {
+		auto b = b_;
+
+		while (not (a.empty() or b.empty())) {
+			if (a.front() == b.front()) {
+				a.pop_front();
+				b.pop_front();
+				continue;
+			}
+
+			return false;
+		}
+
+		return b.empty();
+	}
+
+	template <
+		typename A,
+		typename B,
+		typename V = typename std::enable_if_t<
+			std::is_same_v<typename A::value_type, typename B::value_type>,
+			typename B::value_type
+		>
+	>
+	bool ends_with (A a, B const b_) {
+		auto b = b_;
+
+		while (not (a.empty() or b.empty())) {
+			if (a.back() == b.back()) {
+				a.pop_back();
+				b.pop_back();
+				continue;
+			}
+
+			return false;
+		}
+
+		return b.empty();
+	}
+
 	template <typename I>
 	struct Range {
 		I _begin;
@@ -265,6 +338,21 @@ namespace __ranger {
 			return true;
 		}
 
+		template <typename E>
+		bool contains (E const& e) const {
+			return __ranger::contains(*this, e);
+		}
+
+		template <typename E>
+		bool starts_with (E const& e) const {
+			return __ranger::starts_with(*this, e);
+		}
+
+		template <typename E>
+		bool ends_with (E const& e) const {
+			return __ranger::ends_with(*this, e);
+		}
+
 		template <typename F>
 		size_t count (F const f) const {
 			size_t result = 0;
@@ -362,7 +450,6 @@ namespace ranger {
 	template <typename F, typename R>
 	auto ordered (R& r) {
 		using iterator = decltype(r.begin());
-
 		return __ranger::OrderedRange<iterator, F>(r.begin(), r.end());
 	}
 

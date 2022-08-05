@@ -3,3 +3,4 @@
 -Wall
 -Wextra
 -Wconversion
+-fsanitize=undefined

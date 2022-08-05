@@ -593,6 +593,56 @@ void compatTests () {
 	assert(compat::read_from_chars(vb, 0) == -55);
 }
 
+void algoRangeTests () {
+	auto v = std::vector<int>{1, 2, 3, 4, 5, 6, 7};
+	auto va = range(v);
+
+	// contains
+	assert(va.contains(range(std::array<int, 0>{})));
+	assert(va.contains(range(va)));
+
+	assert(va.contains(range(std::array{1})));
+	assert(va.contains(range(std::array{4})));
+	assert(va.contains(range(std::array{4, 5})));
+	assert(va.contains(range(std::array{4, 5, 6})));
+	assert(va.contains(range(std::array{7})));
+
+	assert(not va.contains(range(std::array{0}))); // a missing 0
+	assert(not va.contains(range(std::array{1, 2, 3, 4, 5, 6, 7, 7}))); // a missing 7
+	assert(not va.contains(range(std::array{6, 7, 8}))); // a missing 8
+	assert(not va.contains(range(std::array{8}))); // a missing 8, 8
+	assert(not va.contains(range(std::array{1, 3, 4}))); // b missing 2
+
+	// starts_with
+	assert(va.starts_with(range(std::array<int, 0>{})));
+	assert(va.starts_with(range(va)));
+
+	assert(va.starts_with(range(std::array{1})));
+	assert(va.starts_with(range(std::array{1, 2, 3})));
+	assert(not va.starts_with(range(std::array{0})));
+	assert(not va.starts_with(range(std::array{1, 2, 4})));
+	assert(not va.starts_with(range(std::array{1, 2, 3, 4, 5, 6, 7, 8})));
+	assert(not va.starts_with(range(std::array{2})));
+	assert(not va.starts_with(range(std::array{2, 3})));
+	assert(not va.starts_with(range(std::array{6, 7})));
+	assert(not va.starts_with(range(std::array{7})));
+
+	// ends_with
+	assert(va.ends_with(range(std::array<int, 0>{})));
+	assert(va.ends_with(range(va)));
+
+	assert(va.ends_with(range(std::array{7})));
+	assert(va.ends_with(range(std::array{6, 7})));
+	assert(va.ends_with(range(std::array{5, 6, 7})));
+	assert(not va.ends_with(range(std::array{0})));
+	assert(not va.ends_with(range(std::array{1})));
+	assert(not va.ends_with(range(std::array{1, 2})));
+	assert(not va.ends_with(range(std::array{6})));
+	assert(not va.ends_with(range(std::array{6, 5})));
+	assert(not va.ends_with(range(std::array{1, 2, 4})));
+	assert(not va.ends_with(range(std::array{1, 2, 3, 4, 5, 6, 7, 8})));
+}
+
 int main () {
 	rangeTests();
 	rangeTests2();
@@ -610,6 +660,7 @@ int main () {
 	signedDistanceTests();
 	nullTests();
 	algoTests();
+	algoRangeTests();
 	compatTests();
 
 	return 0;
