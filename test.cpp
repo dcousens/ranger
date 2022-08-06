@@ -40,47 +40,61 @@ auto const S123456 = std::array{1, 2, 3, 4, 5, 6};
 auto const S1234567 = std::array{1, 2, 3, 4, 5, 6, 7};
 
 int main () {
-describe("general", [](auto test) {
-	auto a = std::array<int, 32>{};
-	for (size_t i = 0; i < a.size(); ++i) a[i] = static_cast<int>((i * 2) + 1);
+describe("drop / take", [&](auto test) {
+	test(range(S1234567).drop(0).size() == 7 - 0);
+	test(range(S1234567).drop(3).size() == 7 - 3);
+	test(range(S1234567).drop(4).size() == 7 - 4);
+	test(range(S1234567).drop(5).size() == 7 - 5);
+	test(range(S1234567).drop(7).size() == 7 - 7);
 
-	auto b = range(a).drop(10);
-	test(a.size() == 32);
-	test(b.size() == 22);
+	test(range(S1234567).take(0).size() == 0);
+	test(range(S1234567).take(5).size() == 5);
+	test(range(S1234567).take(6).size() == 6);
+	test(range(S1234567).take(7).size() == 7);
 
-	test(b.front() == 21);
-	test(b.front() == b[0]);
+	test(range(S1234567).take(3) == S123);
+	test(range(S1234567).take(4) == S1234);
+	test(range(S1234567).take(6) == S123456);
+	test(range(S1234567).take(6) != S1234567);
+	test(range(S1234567).take(7) == S1234567);
 
-	const auto c = b.drop(21);
-	test(a.size() == 32);
-	test(b.size() == 22);
-	test(c.size() == 1);
-	test(c.front() == 63);
-	test(c.back() == 63);
-	test(c[0] == 63);
+	test(range(S1234567).drop_back(0) != S123);
+	test(range(S1234567).drop_back(0) != S1234);
+	test(range(S1234567).drop_back(0) != S123456);
+	test(range(S1234567).drop_back(0) == S1234567);
 
-	auto d = range(a);
-	d[0] = 95;
-	d[d.size() - 2] = 54;
-	d[d.size() - 1] = 17;
-	test(d.front() == 95);
-	d.front() = 96;
-	test(d.front() == 96);
-	test(d.back() == 17);
-	d.back() = 11;
-	test(d.back() == 11);
-	d.pop_back();
-	test(d.back() == 54);
-
-	d = d.drop(20);
-	test(d[0] == a[20]);
-
-	auto e = d.drop(100); // oh no! past the end
-	test(e.empty()); // thats OK
-	// e.front(); // test or U/B
+	test(range(S1234567).drop_back(4) == S123);
+	test(range(S1234567).drop_back(3) == S1234);
+	test(range(S1234567).drop_back(1) == S123456);
 });
 
-describe("general (2)", [](auto test) {
+describe("size", [&](auto test) {
+	test(range(S123).size() == 3);
+	test(range(S1234).size() == 4);
+	test(range(S123456).size() == 6);
+});
+
+describe("operators", [&](auto test) {
+	auto const a = range(S1234);
+	auto const b = range(std::array{1, 2, 3, 5});
+	auto const c = std::array{1, 2, 3, 5};
+
+	test(a < b);
+	test(b > a);
+	test(a == a);
+	test(a != b);
+	test(b != a);
+	test(b == b);
+
+	test(a < c);
+// 		test(c > a);
+	test(a == a);
+	test(a != c);
+// 		test(c != a);
+	test(c == c);
+});
+
+describe("various", [](auto test) {
 	auto e = std::vector<uint8_t>(60);
 	test(e.size() == 60);
 	const auto f = range(e).drop(10);

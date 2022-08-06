@@ -308,8 +308,18 @@ namespace __ranger {
 		}
 
 		template <typename B>
+		bool operator> (B const& b) const {
+			return std::lexicographical_compare(b.begin(), b.end(), this->begin(), this->end());
+		}
+
+		template <typename B>
 		bool operator== (B const& b) const {
 			return std::equal(this->begin(), this->end(), b.begin(), b.end());
+		}
+
+		template <typename B>
+		bool operator!= (B const& b) const {
+			return not std::equal(this->begin(), this->end(), b.begin(), b.end());
 		}
 
 		template <typename F>
