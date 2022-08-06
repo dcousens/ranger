@@ -100,18 +100,23 @@ namespace __ranger {
 	}
 
 	template <typename I>
-	void put (Range<I>& a, typename Range<I>::value_type v) {
+	auto put (Range<I>& a, typename Range<I>::value_type v) {
+		if (a.empty()) return false;
 		a.front() = v;
 		a.pop_front();
+		return true;
 	}
 
 	template <typename A, typename B>
-	void put (Range<A>& a, Range<B> b) {
+	auto put (Range<A>& a, Range<B> b) {
 		while (not b.empty()) {
+			if (a.empty()) return false;
 			a.front() = b.front();
 			a.pop_front();
 			b.pop_front();
 		}
+
+		return true;
 	}
 
 	template <typename A, typename B>
@@ -379,7 +384,7 @@ namespace __ranger {
 		}
 
 		template <typename E>
-		void put (E e) { __ranger::put(*this, e); }
+		auto put (E const e) { return __ranger::put(*this, e); }
 	};
 
 	template <typename I, typename F>
