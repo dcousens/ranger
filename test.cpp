@@ -92,6 +92,24 @@ describe("operators", [&](auto test) {
 	test(a != c);
 // 		test(c != a);
 	test(c == c);
+
+	// lexicographical_compare
+	{
+		auto const min = range(std::array{1,5,0,0});
+		auto const max = range(std::array{3,4,0,0});
+
+		for (auto const value : {
+			std::array{1,6,0,0},
+			std::array{2,4,0,0},
+			std::array{3,3,9,9},
+		}) {
+			test(range(value) > min);
+			test(range(value) < max);
+		}
+
+		test(range(std::array{5,6,0}) > min);
+		test(range(std::array{2,1,0,0,0}) < max);
+	}
 });
 
 describe("various", [](auto test) {
