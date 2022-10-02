@@ -232,7 +232,7 @@ describe("reverse", [](auto test) {
 	test(reverse(range(yy)).drop(4).size() == 0);
 });
 
-#pragma pack(1)
+#pragma pack(push, 1)
 struct Foo {
 	uint8_t a, b, c, d;
 
@@ -240,7 +240,7 @@ struct Foo {
 		return a == x.a and b == x.b and c == x.c and d == x.d;
 	}
 };
-#pragma pack()
+#pragma pack(pop)
 
 // TODO: re-do
 describe("serial", [](auto test) {
