@@ -570,6 +570,9 @@ describe("count", [](auto test) {
 	test(va.count([](auto x) { return x == 3; }) == 1);
 	test(va.count([](auto x) { return x > 0 and x < 4; }) == 3);
 	test(va.count([](auto x) { return x == 6; }) == 0);
+
+	// unmodified
+	test(va == range(S1234));
 });
 
 describe("any", [](auto test) {
@@ -577,6 +580,9 @@ describe("any", [](auto test) {
 	test(va.any([](auto x) { return x == 3; }));
 	test(not va.any([](auto x) { return x == 6; }));
 	test(not va.take(0).any([](auto) { return true; }));
+
+	// unmodified
+	test(va == range(S1234));
 });
 
 describe("all", [](auto test) {
@@ -584,6 +590,9 @@ describe("all", [](auto test) {
 	test(va.all([](auto x) { return x > 0 and x < 5; }));
 	test(not va.all([](auto x) { return x == 3; }));
 	test(va.take(0).all([](auto) { return false; }));
+
+	// unmodified
+	test(va == range(S1234));
 });
 
 describe("contains", [](auto test) {
