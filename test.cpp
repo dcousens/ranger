@@ -39,6 +39,7 @@ auto const S123 = std::array{1, 2, 3};
 auto const S1234 = std::array{1, 2, 3, 4};
 auto const S123456 = std::array{1, 2, 3, 4, 5, 6};
 auto const S1234567 = std::array{1, 2, 3, 4, 5, 6, 7};
+auto const TQBFJ = zstr_range("the quick brown fox jumped");
 
 int main () {
 describe("drop / take", [&](auto test) {
@@ -726,6 +727,15 @@ describe("compat", [](auto test) {
 	vb.pop_front();
 	test(compat::peek_from_chars(vb, 0) == -55);
 	test(compat::read_from_chars(vb, 0) == -55);
+});
+
+// test nothing has been modified
+describe("no modifications", [&](auto test) {
+	test(S123 == std::array{1, 2, 3});
+	test(S1234 == std::array{1, 2, 3, 4});
+	test(S123456 == std::array{1, 2, 3, 4, 5, 6});
+	test(S1234567 == std::array{1, 2, 3, 4, 5, 6, 7});
+	test(TQBFJ == zstr_range("the quick brown fox jumped"));
 });
 
 	return 0;
