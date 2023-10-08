@@ -120,27 +120,17 @@ namespace __ranger {
 	}
 
 	template <typename A, typename B>
-	bool contains (Range<A> a, Range<B> const b_) {
-		auto b = b_;
-
-		while (not (a.empty() or b.empty())) {
-			if (a.front() == b.front()) {
-				a.pop_front();
-				b.pop_front();
-				continue;
-			}
-
+	bool contains (Range<A> a, Range<B> const b) {
+		while (not a.empty()) {
+			if (a.starts_with(b)) return true;
 			a.pop_front();
-			b = b_; // reset
 		}
 
-		return b.empty();
+		return false;;
 	}
 
 	template <typename A, typename B>
-	bool starts_with (Range<A> a, Range<B> const b_) {
-		auto b = b_;
-
+	bool starts_with (Range<A> a, Range<B> b) {
 		while (not (a.empty() or b.empty())) {
 			if (a.front() == b.front()) {
 				a.pop_front();
@@ -155,9 +145,7 @@ namespace __ranger {
 	}
 
 	template <typename A, typename B>
-	bool ends_with (Range<A> a, Range<B> const b_) {
-		auto b = b_;
-
+	bool ends_with (Range<A> a, Range<B> b) {
 		while (not (a.empty() or b.empty())) {
 			if (a.back() == b.back()) {
 				a.pop_back();

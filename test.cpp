@@ -598,12 +598,19 @@ describe("contains", [](auto test) {
 	test(va.contains(range(std::array{4, 5})));
 	test(va.contains(range(std::array{4, 5, 6})));
 	test(va.contains(range(std::array{7})));
+	test(va.contains(range(S1234)));
+	test(va.contains(range(S123456)));
+	test(va.contains(range(S1234567)));
 
 	test(not va.contains(range(std::array{0}))); // a missing 0
-	test(not va.contains(range(std::array{1, 2, 3, 4, 5, 6, 7, 7}))); // a missing 7
+	test(not va.contains(range(std::array{1, 2, 3, 4, 5, 6, 7, 7}))); // a missing second 7
 	test(not va.contains(range(std::array{6, 7, 8}))); // a missing 8
-	test(not va.contains(range(std::array{8}))); // a missing 8, 8
+	test(not va.contains(range(std::array{8}))); // a missing 8
+	test(not va.contains(range(std::array{4, 5, 8}))); // b missing 6, 7
 	test(not va.contains(range(std::array{1, 3, 4}))); // b missing 2
+
+	// unmodified
+	test(va == range(S1234567));
 });
 
 describe("starts_with", [](auto test) {
@@ -622,6 +629,9 @@ describe("starts_with", [](auto test) {
 	test(not va.starts_with(range(std::array{2, 3})));
 	test(not va.starts_with(range(std::array{6, 7})));
 	test(not va.starts_with(range(std::array{7})));
+
+	// unmodified
+	test(va == range(S1234567));
 });
 
 describe("ends_with", [](auto test) {
@@ -648,6 +658,9 @@ describe("ends_with", [](auto test) {
 	test(    foobar.contains(zstr_range("ooba")));
 	test(     foobar.ends_with(zstr_range("bar")));
 	test(  foobar.ends_with(zstr_range("foobar")));
+
+	// unmodified
+	test(va == range(S1234567));
 });
 
 describe("unto", [](auto test) {
