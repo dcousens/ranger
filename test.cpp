@@ -674,34 +674,39 @@ describe("ends_with", [](auto test) {
 });
 
 describe("unto", [](auto test) {
-	auto data = zstr_range("the quick brown fox jumped");
-	auto save = data;
+	auto interim = TQBFJ.drop_until([](auto c) { return c == 'b'; });
+	auto const bfj = TQBFJ.drop_unto(interim);
+	test(bfj == zstr_range("brown fox jumped"));
 
-	save.pop_until([](auto c) { return c == 'b'; });
-	data = data.drop_unto(save);
-	test(data == zstr_range("brown fox jumped"));
+	interim = interim.drop_back_until([](auto c) { return c == 'x'; });
+	auto const bf = bfj.drop_back_unto(interim);
+	test(bf == zstr_range("brown fox"));
 
-	save.pop_back_until([](auto c) { return c == 'x'; });
-	data = data.drop_back_unto(save);
-	test(data == zstr_range("brown fox"));
+	auto const a = TQBFJ.drop_unto(zstr_range("out of bounds"));
+	test(a.empty()); // truncated or unchanged, not U/B
 
-	auto const a = data.drop_unto(zstr_range("out of bounds"));
-	test(a.empty() or a == data); // truncated or unchanged, but not U/B
+	auto const b = TQBFJ.drop_back_unto(zstr_range("out of bounds (2)"));
+	test(b == TQBFJ); // truncated or unchanged, not U/B
 
-	auto const b = data.drop_back_unto(zstr_range("out of bounds (2)"));
-	test(b.empty() or b == data); // truncated or unchanged, but not U/B
+	auto const fox = bf.drop(6);
+	test(fox == zstr_range("fox"));
 
-	auto const fox = data.drop(6);
-	auto const c = data.drop_unto(fox);
+	auto const c = bf.drop_unto(fox);
 	test(c == zstr_range("fox"));
 
-	auto const d = data.drop_back_unto(fox);
+	auto const d = bf.drop_back_unto(fox);
 	test(d == zstr_range("brown fox"));
 
-	auto const brown = data.drop_back_until([](auto c) { return c == 'n'; });
+	auto const brown = bf.drop_back_until([](auto c) { return c == 'n'; });
 	test(brown == zstr_range("brown"));
 
+	auto const quick = TQBFJ.drop(4).take(5);
+	test(quick == zstr_range("quick"));
+
 	test(brown.drop_unto(fox).empty()); // truncated
+	test(brown.drop_unto(quick) == brown); // unchanged
+
+	test(brown.drop_back_unto(quick).empty()); // truncated
 	test(brown.drop_back_unto(fox) == brown); // unchanged
 
 	test(fox.drop_unto(brown) == fox); // unchanged
