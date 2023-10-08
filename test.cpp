@@ -1,5 +1,6 @@
 #include <array>
 #include <cstring>
+#include <cstdint>
 #include <forward_list>
 #include <fstream>
 #include <iostream>
@@ -616,6 +617,7 @@ describe("starts_with", [](auto test) {
 	test(not va.starts_with(range(std::array{0})));
 	test(not va.starts_with(range(std::array{1, 2, 4})));
 	test(not va.starts_with(range(std::array{1, 2, 3, 4, 5, 6, 7, 8})));
+	test(not va.starts_with(range(std::array{1, 2, 3, 4, 5, 6, 7, 8, 9})));
 	test(not va.starts_with(range(std::array{2})));
 	test(not va.starts_with(range(std::array{2, 3})));
 	test(not va.starts_with(range(std::array{6, 7})));
