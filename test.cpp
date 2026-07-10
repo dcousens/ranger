@@ -19,17 +19,19 @@ using namespace ranger;
 static auto indent = 0;
 template <typename F>
 auto describe (std::string const description, F const f) {
-	for (auto i = indent; i > 0; --i) std::cerr << ' ';
+	for (auto i = indent; i > 0; --i) std::cout << ' ';
 	indent += 1;
-	std::cerr << description << std::endl;
+	std::cout << description << std::endl;
 	f([](bool const condition, std::string const message = "") {
-		if (condition) return;
+		auto const result = condition ? "PASS" : "FAIL";
+		if (not condition or not message.empty()) for (auto i = indent; i > 0; --i) std::cout << ' ';
+		if (message.empty()) {
+			if (not condition) std::cout << result << " for anonymous test" << std::endl;
+			return;
+		}
 
-		for (auto i = indent; i > 0; --i) std::cerr << ' ';
-		std::cerr << "FAIL";
-		if (not message.empty()) std::cerr << " for '" << message << "'";
-		std::cerr << std::endl;
-		if (not condition) exit(1);
+		//	{result} for test '{message}'
+		std::cout << result << " for '" << message << "'" << std::endl;
 	});
 	indent -= 1;
 }
@@ -42,13 +44,26 @@ auto const TQBFJ = zstr_range("the quick brown fox jumped");
 auto const OOB = zstr_range("out of bounds");
 
 int main () {
-describe("drop / take", [&](auto test) {
+describe("drop", [&](auto test) {
 	test(range(S1234567).drop(0).size() == 7 - 0);
 	test(range(S1234567).drop(3).size() == 7 - 3);
 	test(range(S1234567).drop(4).size() == 7 - 4);
 	test(range(S1234567).drop(5).size() == 7 - 5);
 	test(range(S1234567).drop(7).size() == 7 - 7);
+});
 
+describe("drop_back", [&](auto test) {
+	test(range(S1234567).drop_back(0) != S123);
+	test(range(S1234567).drop_back(0) != S1234);
+	test(range(S1234567).drop_back(0) != S123456);
+	test(range(S1234567).drop_back(0) == S1234567);
+
+	test(range(S1234567).drop_back(4) == S123);
+	test(range(S1234567).drop_back(3) == S1234);
+	test(range(S1234567).drop_back(1) == S123456);
+});
+
+describe("take", [&](auto test) {
 	test(range(S1234567).take(0).size() == 0);
 	test(range(S1234567).take(5).size() == 5);
 	test(range(S1234567).take(6).size() == 6);
@@ -59,15 +74,6 @@ describe("drop / take", [&](auto test) {
 	test(range(S1234567).take(6) == S123456);
 	test(range(S1234567).take(6) != S1234567);
 	test(range(S1234567).take(7) == S1234567);
-
-	test(range(S1234567).drop_back(0) != S123);
-	test(range(S1234567).drop_back(0) != S1234);
-	test(range(S1234567).drop_back(0) != S123456);
-	test(range(S1234567).drop_back(0) == S1234567);
-
-	test(range(S1234567).drop_back(4) == S123);
-	test(range(S1234567).drop_back(3) == S1234);
-	test(range(S1234567).drop_back(1) == S123456);
 });
 
 describe("size", [&](auto test) {
