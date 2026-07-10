@@ -22,12 +22,12 @@ auto describe (std::string const description, F const f) {
 	for (auto i = indent; i > 0; --i) std::cerr << ' ';
 	indent += 1;
 	std::cerr << description << std::endl;
-	f([](bool const condition, std::string const test = "") {
+	f([](bool const condition, std::string const message = "") {
 		if (condition) return;
 
 		for (auto i = indent; i > 0; --i) std::cerr << ' ';
-		std::cerr << "fail";
-		if (not test.empty()) std::cerr << " " << test;
+		std::cerr << "FAIL";
+		if (not message.empty()) std::cerr << " for \"" << message << "\"";
 		std::cerr << std::endl;
 		if (not condition) exit(1);
 	});
