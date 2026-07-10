@@ -223,15 +223,17 @@ namespace __ranger {
 			return copy;
 		}
 
+		// drops up to the target range
 		auto drop_unto (Range const b) const {
-			if (b.begin() < this->begin()) return *this;
-			if (b.begin() > this->end()) return Range(this->end(), this->end());
+			if (this->begin() > b.begin()) return *this; // do nothing
+			if (this->end() < b.begin()) return Range(this->end(), this->end()); // empty
 			return Range(b.begin(), this->end());
 		}
 
+		// drops from the back to the target range
 		auto drop_back_unto (Range const b) const {
-			if (b.end() > this->end()) return *this;
-			if (b.end() < this->begin()) return Range(this->begin(), this->begin());
+			if (this->end() < b.begin()) return *this; // do nothing
+			if (this->begin() > b.end()) return Range(this->end(), this->end()); // empty
 			return Range(this->begin(), b.end());
 		}
 

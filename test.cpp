@@ -27,7 +27,7 @@ auto describe (std::string const description, F const f) {
 
 		for (auto i = indent; i > 0; --i) std::cerr << ' ';
 		std::cerr << "FAIL";
-		if (not message.empty()) std::cerr << " for \"" << message << "\"";
+		if (not message.empty()) std::cerr << " for '" << message << "'";
 		std::cerr << std::endl;
 		if (not condition) exit(1);
 	});
@@ -39,6 +39,7 @@ auto const S1234 = std::array{1, 2, 3, 4};
 auto const S123456 = std::array{1, 2, 3, 4, 5, 6};
 auto const S1234567 = std::array{1, 2, 3, 4, 5, 6, 7};
 auto const TQBFJ = zstr_range("the quick brown fox jumped");
+auto const OOB = zstr_range("out of bounds");
 
 int main () {
 describe("drop / take", [&](auto test) {
@@ -571,7 +572,7 @@ describe("count", [](auto test) {
 	test(va.count([](auto x) { return x > 0 and x < 4; }) == 3);
 	test(va.count([](auto x) { return x == 6; }) == 0);
 
-	// unmodified
+	// unchanged
 	test(va == range(S1234));
 });
 
@@ -581,7 +582,7 @@ describe("any", [](auto test) {
 	test(not va.any([](auto x) { return x == 6; }));
 	test(not va.take(0).any([](auto) { return true; }));
 
-	// unmodified
+	// unchanged
 	test(va == range(S1234));
 });
 
@@ -591,7 +592,7 @@ describe("all", [](auto test) {
 	test(not va.all([](auto x) { return x == 3; }));
 	test(va.take(0).all([](auto) { return false; }));
 
-	// unmodified
+	// unchanged
 	test(va == range(S1234));
 });
 
@@ -618,7 +619,7 @@ describe("contains", [](auto test) {
 	test(not va.contains(range(std::array{4, 5, 8}))); // b missing 6, 7
 	test(not va.contains(range(std::array{1, 3, 4}))); // b missing 2
 
-	// unmodified
+	// unchanged
 	test(va == range(S1234567));
 });
 
@@ -639,7 +640,7 @@ describe("starts_with", [](auto test) {
 	test(not va.starts_with(range(std::array{6, 7})));
 	test(not va.starts_with(range(std::array{7})));
 
-	// unmodified
+	// unchanged
 	test(va == range(S1234567));
 });
 
@@ -668,39 +669,43 @@ describe("ends_with", [](auto test) {
 	test(     foobar.ends_with(zstr_range("bar")));
 	test(  foobar.ends_with(zstr_range("foobar")));
 
-	// unmodified
+	// unchanged
 	test(va == range(S1234567));
 });
+
+assert(OOB.data() < TQBFJ.data()); // we are comparing UNRELATED ranges intentionally, we need determinism
 
 describe("unto", [](auto test) {
 	auto interim = TQBFJ.drop_until([](auto c) { return c == 'b'; });
 	auto const bfj = TQBFJ.drop_unto(interim);
 	test(bfj == zstr_range("brown fox jumped"));
+	test(TQBFJ == zstr_range("the quick brown fox jumped"), "TQBFJ is unchanged");
 
 	interim = interim.drop_back_until([](auto c) { return c == 'x'; });
 	auto const bf = bfj.drop_back_unto(interim);
 	test(bf == zstr_range("brown fox"));
+	test(bfj == zstr_range("brown fox jumped"), "bfj is unchanged");
 
-	auto const a = TQBFJ.drop_unto(zstr_range("out of bounds"));
-	test(a.empty()); // truncated or unchanged, not U/B
+	auto const a = TQBFJ.drop_unto(OOB);
+	test(a == TQBFJ, "drop_unto out of bounds is unchanged"); // not U/B
 
-	auto const b = TQBFJ.drop_back_unto(zstr_range("out of bounds (2)"));
-	test(b == TQBFJ); // truncated or unchanged, not U/B
+	auto const b = TQBFJ.drop_back_unto(OOB);
+	test(b.empty(), "drop_back_unto out of bounds is empty"); // not U/B
 
 	auto const fox = bf.drop(6);
-	test(fox == zstr_range("fox"));
+	test(fox == zstr_range("fox"), "drops until fox (by count)");
 
 	auto const c = bf.drop_unto(fox);
-	test(c == zstr_range("fox"));
+	test(c == zstr_range("fox"), "drops until fox");
 
 	auto const d = bf.drop_back_unto(fox);
-	test(d == zstr_range("brown fox"));
+	test(d == zstr_range("brown fox"), "drops until fox, from the back");
 
 	auto const brown = bf.drop_back_until([](auto c) { return c == 'n'; });
-	test(brown == zstr_range("brown"));
+	test(brown == zstr_range("brown"), "drops until brown, from the back, with a lambda");
 
 	auto const quick = TQBFJ.drop(4).take(5);
-	test(quick == zstr_range("quick"));
+	test(quick == zstr_range("quick"), "drops until quick (by drop and take)");
 
 	test(brown.drop_unto(fox).empty()); // truncated
 	test(brown.drop_unto(quick) == brown); // unchanged
