@@ -17,12 +17,16 @@
 using namespace ranger;
 
 static auto indent = 0;
+static auto failing = 0;
+
 template <typename F>
 auto describe (std::string const description, F const f) {
 	for (auto i = indent; i > 0; --i) std::cout << ' ';
 	indent += 1;
 	std::cout << description << std::endl;
 	f([](bool const condition, std::string const message = "") {
+		if (not condition) failing++;
+
 		auto const result = condition ? "PASS" : "FAIL";
 		if (not condition or not message.empty()) for (auto i = indent; i > 0; --i) std::cout << ' ';
 		if (message.empty()) {
@@ -753,5 +757,6 @@ describe("no modifications", [&](auto test) {
 	test(TQBFJ == zstr_range("the quick brown fox jumped"));
 });
 
-	return 0;
+	// non-zero exit for failures
+	return failing > 0 ? 1 : 0;
 }
